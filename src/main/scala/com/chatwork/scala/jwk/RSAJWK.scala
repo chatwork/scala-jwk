@@ -81,8 +81,8 @@ object RSAJWK extends RSAJWKJsonImplicits {
   def fromRSAPublicKey(rsaPublicKey: RSAPublicKey,
                        publicKeyUseType: Option[PublicKeyUseType] = None,
                        keyOperations: KeyOperations = KeyOperations.empty,
-                       keyId: Option[KeyId] = None,
                        algorithmType: Option[JWSAlgorithmType] = None,
+                       keyId: Option[KeyId] = None,
                        x509Url: Option[URI] = None,
                        x509CertificateSHA1Thumbprint: Option[Base64String] = None,
                        x509CertificateSHA256Thumbprint: Option[Base64String] = None,
@@ -275,7 +275,8 @@ class RSAJWK private[jwk] (
     qi: Option[Base64String] = None,
     oth: Seq[OtherPrimesInfo] = Seq.empty,
     privateKey: Option[PrivateKey] = None,
-    expireAt: Option[ZonedDateTime] = None
+    expireAt: Option[ZonedDateTime] = None,
+    keyStore: Option[KeyStore] = None
 ) extends JWK(
       KeyType.RSA,
       publicKeyUseType,
@@ -286,7 +287,8 @@ class RSAJWK private[jwk] (
       x509CertificateSHA256Thumbprint,
       x509CertificateSHA1Thumbprint,
       x509CertificateChain,
-      expireAt
+      expireAt,
+      keyStore
     )
     with AssymetricJWK {
 
@@ -340,15 +342,15 @@ class RSAJWK private[jwk] (
   override def getRequiredParams: Map[String, Any] =
     Map("e" -> e.toString, "kty" -> keyType.entryName, "n" -> n.toString)
 
-  def toRSAPrivateKey: Either[RSAPrivateKeyCreationError, Option[RSAPrivateKey]] = {
+  def toRSAPrivateKey: Either[PrivateKeyCreationError, Option[RSAPrivateKey]] = {
     privateExponent
       .map { _d =>
         val privateKeySpecEither = for {
           _modulus <- modulus.decodeToBigInt.leftMap(
-            err => RSAPrivateKeyCreationError(s"KeySpec creation failed.(${err.message})")
+            err => PrivateKeyCreationError(s"KeySpec creation failed.(${err.message})")
           )
           _privateExponent <- _d.decodeToBigInt.leftMap(
-            err => RSAPrivateKeyCreationError(s"KeySpec creation failed.(${err.message})")
+            err => PrivateKeyCreationError(s"KeySpec creation failed.(${err.message})")
           )
           privateKeySpec <- createRSAPrivateKeySpec(_modulus, _privateExponent)
         } yield privateKeySpec
@@ -357,10 +359,8 @@ class RSAJWK private[jwk] (
             val factory = KeyFactory.getInstance("RSA")
             Right(Some(factory.generatePrivate(spec).asInstanceOf[RSAPrivateKey]))
           } catch {
-            case e: NoSuchAlgorithmException =>
-              Left(RSAPrivateKeyCreationError(e.getMessage))
-            case e: InvalidKeySpecException =>
-              Left(RSAPrivateKeyCreationError(e.getMessage))
+            case e @ (_: NoSuchAlgorithmException | _: InvalidKeySpecException) =>
+              Left(PrivateKeyCreationError(e.getMessage))
           }
         }
       }
@@ -370,23 +370,23 @@ class RSAJWK private[jwk] (
   private def createRSAPrivateKeySpec(
       _modulus: BigInt,
       _privateExponent: BigInt
-  ): Either[RSAPrivateKeyCreationError, RSAPrivateKeySpec] = {
+  ): Either[PrivateKeyCreationError, RSAPrivateKeySpec] = {
     p.map { _p =>
         for {
-          _publicExponent <- e.decodeToBigInt.leftMap(e => RSAPrivateKeyCreationError(e.message))
-          _primeP         <- _p.decodeToBigInt.leftMap(e => RSAPrivateKeyCreationError(e.message))
+          _publicExponent <- e.decodeToBigInt.leftMap(e => PrivateKeyCreationError(e.message))
+          _primeP         <- _p.decodeToBigInt.leftMap(e => PrivateKeyCreationError(e.message))
           _primeQ <- q
-            .map(_.decodeToBigInt.leftMap(e => RSAPrivateKeyCreationError(e.message)))
-            .getOrElse(Left(RSAPrivateKeyCreationError("primeQ is not found.")))
+            .map(_.decodeToBigInt.leftMap(e => PrivateKeyCreationError(e.message)))
+            .getOrElse(Left(PrivateKeyCreationError("primeQ is not found.")))
           _primeExponentP <- dp
-            .map(_.decodeToBigInt.leftMap(e => RSAPrivateKeyCreationError(e.message)))
-            .getOrElse(Left(RSAPrivateKeyCreationError("primeExponentP is not found.")))
+            .map(_.decodeToBigInt.leftMap(e => PrivateKeyCreationError(e.message)))
+            .getOrElse(Left(PrivateKeyCreationError("primeExponentP is not found.")))
           _primeExponentQ <- dq
-            .map(_.decodeToBigInt.leftMap(e => RSAPrivateKeyCreationError(e.message)))
-            .getOrElse(Left(RSAPrivateKeyCreationError("primeExponentQ is not found.")))
+            .map(_.decodeToBigInt.leftMap(e => PrivateKeyCreationError(e.message)))
+            .getOrElse(Left(PrivateKeyCreationError("primeExponentQ is not found.")))
           _crtCoefficient <- qi
-            .map(_.decodeToBigInt.leftMap(e => RSAPrivateKeyCreationError(e.message)))
-            .getOrElse(Left(RSAPrivateKeyCreationError("crtCoefficient is not found.")))
+            .map(_.decodeToBigInt.leftMap(e => PrivateKeyCreationError(e.message)))
+            .getOrElse(Left(PrivateKeyCreationError("crtCoefficient is not found.")))
           spec <- createInternalPrivateKeySpec(_modulus,
                                                _publicExponent,
                                                _privateExponent,
@@ -398,7 +398,7 @@ class RSAJWK private[jwk] (
         } yield spec
       }
       .getOrElse {
-        Either.right[RSAPrivateKeyCreationError, RSAPrivateKeySpec](
+        Either.right[PrivateKeyCreationError, RSAPrivateKeySpec](
           new RSAPrivateKeySpec(_modulus.bigInteger, _privateExponent.bigInteger)
         )
       }
@@ -413,19 +413,19 @@ class RSAJWK private[jwk] (
       _primeExponentP: BigInt,
       _primeExponentQ: BigInt,
       _crtCoefficient: BigInt
-  ): Either[RSAPrivateKeyCreationError, RSAPrivateKeySpec] = {
+  ): Either[PrivateKeyCreationError, RSAPrivateKeySpec] = {
     otherPrimes
-      .foldLeft(Either.right[RSAPrivateKeyCreationError, Seq[RSAOtherPrimeInfo]](Seq.empty)) { (r, otherPrimesInfo) =>
+      .foldLeft(Either.right[PrivateKeyCreationError, Seq[RSAOtherPrimeInfo]](Seq.empty)) { (r, otherPrimesInfo) =>
         val e = for {
           otherPrime <- otherPrimesInfo.primeFactor.decodeToBigInt
             .map(_.bigInteger)
-            .leftMap(e => RSAPrivateKeyCreationError(e.message))
+            .leftMap(e => PrivateKeyCreationError(e.message))
           otherPrimeExponent <- otherPrimesInfo.factorCRTExponent.decodeToBigInt
             .map(_.bigInteger)
-            .leftMap(e => RSAPrivateKeyCreationError(e.message))
+            .leftMap(e => PrivateKeyCreationError(e.message))
           otherCrtCoefficient <- otherPrimesInfo.factorCRTCoefficient.decodeToBigInt
             .map(_.bigInteger)
-            .leftMap(e => RSAPrivateKeyCreationError(e.message))
+            .leftMap(e => PrivateKeyCreationError(e.message))
         } yield new RSAOtherPrimeInfo(otherPrime, otherPrimeExponent, otherCrtCoefficient)
         for { result <- r; _e <- e } yield result :+ _e
       }
@@ -456,21 +456,19 @@ class RSAJWK private[jwk] (
       }
   }
 
-  def toRSAPublicKey: Either[RSAPublicKeyCreationError, RSAPublicKey] = {
+  def toRSAPublicKey: Either[PublicKeyCreationError, RSAPublicKey] = {
     val specEither = (for {
       modulus  <- n.decodeToBigInt
       exponent <- e.decodeToBigInt
       spec     <- Right(new RSAPublicKeySpec(modulus.bigInteger, exponent.bigInteger))
-    } yield spec).leftMap(e => RSAPublicKeyCreationError(s"KeySpec creation failed.(${e.message})"))
+    } yield spec).leftMap(e => PublicKeyCreationError(s"KeySpec creation failed.(${e.message})"))
     specEither.flatMap { spec =>
       try {
         val factory = KeyFactory.getInstance("RSA")
         Right(factory.generatePublic(spec).asInstanceOf[RSAPublicKey])
       } catch {
-        case e: NoSuchAlgorithmException =>
-          Left(RSAPublicKeyCreationError(e.getMessage))
-        case e: InvalidKeySpecException =>
-          Left(RSAPublicKeyCreationError(e.getMessage))
+        case e @ (_: NoSuchAlgorithmException | _: InvalidKeySpecException) =>
+          Left(PublicKeyCreationError(e.getMessage))
       }
     }
   }
@@ -497,20 +495,20 @@ class RSAJWK private[jwk] (
       r  <- ByteUtils.safeBitLength(_n)
     } yield r
 
-  override def toPublicKey: Either[RSAPublicKeyCreationError, PublicKey] = toRSAPublicKey
+  override def toPublicKey: Either[PublicKeyCreationError, PublicKey] = toRSAPublicKey
 
-  override def toPrivateKey: Either[RSAPrivateKeyCreationError, PrivateKey] = {
+  override def toPrivateKey: Either[PrivateKeyCreationError, PrivateKey] = {
     for {
       prv <- toRSAPrivateKey
       result <- prv.map(Right(_)).getOrElse {
         privateKey
           .map(Right(_))
-          .getOrElse(Left(RSAPrivateKeyCreationError("Illegal Argument: privateKey is not found")))
+          .getOrElse(Left(PrivateKeyCreationError("Illegal Argument: privateKey is not found")))
       }
     } yield result
   }
 
-  override def toKeyPair: Either[RSAKeyCreationError, KeyPair] = {
+  override def toKeyPair: Either[KeyCreationError, KeyPair] = {
     for {
       publicKey  <- toRSAPublicKey
       privateKey <- toPrivateKey
@@ -582,10 +580,6 @@ class RSAJWK private[jwk] (
 trait RSAJWKJsonImplicits extends JsonImplicits {
 
   import io.circe.syntax._
-
-  implicit val UriJsonEncoder: Encoder[URI] = Encoder[String].contramap(_.toString)
-
-  implicit val UriJsonDecoder: Decoder[URI] = Decoder[String].map(URI.create)
 
   implicit val RSAJWKJsonEncoder: Encoder[RSAJWK] = Encoder.instance { v =>
     Json.obj(
