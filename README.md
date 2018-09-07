@@ -1,6 +1,27 @@
 # scala-jwk
 
-This Scala library supports JWKSet(rfc7517).
+This Scala library supports JWKSet(RFC7517).
+
+## Installation
+
+Add the following to your sbt build (2.12.x):
+
+### Release Version
+
+```scala
+resolvers += "Sonatype OSS Release Repository" at "https://oss.sonatype.org/content/repositories/releases/"
+
+libraryDependencies += "com.chatwork" %% "scala-jwk" % "1.0.0"
+```
+
+### Snapshot Version
+
+```scala
+resolvers += "Sonatype OSS Snapshot Repository" at "https://oss.sonatype.org/content/repositories/snapshots/"
+
+libraryDependencies += "com.chatwork" %% "scala-jwk" % "1.0.1-SNAPSHOT"
+```
+
 
 ## How to use
 
