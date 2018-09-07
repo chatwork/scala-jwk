@@ -1,6 +1,6 @@
 package com.chatwork.scala.jwk
 
-import io.circe.{ Decoder, Encoder }
+import io.circe.{Decoder, Encoder}
 
 case class KeyOperations(breachEncapsulationOfValues: Seq[KeyOperationType])
 

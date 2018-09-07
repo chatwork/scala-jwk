@@ -14,8 +14,8 @@ object KeyId extends KeyIdJsonImplicits with Base64StringJsonImplicits {
 
   val base64StringFactory = Base64StringFactory(urlSafe = true, isNoPadding = true)
 
-  def fromRSAPublicKeyParams(modulus: Base64String,
-                             publicExponent: Base64String): Either[JWKThumbprintError, KeyId] = {
+  def fromRSAPublicKeyParams(modulus: Base64String, publicExponent: Base64String): Either[JWKThumbprintError, KeyId] = {
+    require(modulus.urlSafe)
     val json =
       Json.obj("kty" -> Json.fromString(KeyType.RSA.toString), "n" -> modulus.asJson, "e" -> publicExponent.asJson)
     JWKThumbprint.computeFromJson(json).map(v => new KeyId(v.asString))
@@ -23,7 +23,8 @@ object KeyId extends KeyIdJsonImplicits with Base64StringJsonImplicits {
 
   def fromRSAPublicKey(publicKey: RSAPublicKey): Either[JWKThumbprintError, KeyId] = {
     for {
-      n <- base64StringFactory.encode(publicKey.getModulus)
+      n <- base64StringFactory
+        .encode(publicKey.getModulus)
         .leftMap(error => JWKThumbprintError(error.message))
       e <- base64StringFactory
         .encode(publicKey.getPublicExponent)

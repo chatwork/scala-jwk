@@ -11,8 +11,7 @@ import com.github.j5ik2o.base64scala.{Base64String, Base64StringFactory}
 
 object JWKThumbprint extends JWKJsonImplicits {
 
-  def computeFromJWK(jwk: JWK,
-                     hashAlg: String = "SHA-256"): Either[JWKThumbprintError, Base64String] =
+  def computeFromJWK(jwk: JWK, hashAlg: String = "SHA-256"): Either[JWKThumbprintError, Base64String] =
     computeFromJson(jwk.asJson, hashAlg)
 
   private def getDigest(json: Json, hashAlg: String): Either[JWKThumbprintError, Array[Byte]] = {
@@ -22,7 +21,10 @@ object JWKThumbprint extends JWKJsonImplicits {
       Right(md.digest())
     } catch {
       case ex: NoSuchAlgorithmException =>
-        Left(JWKThumbprintError("Couldn't compute JWK thumbprint: Unsupported hash algorithm: " + ex.getMessage, Some(Cause(ex))))
+        Left(
+          JWKThumbprintError("Couldn't compute JWK thumbprint: Unsupported hash algorithm: " + ex.getMessage,
+                             Some(Cause(ex)))
+        )
     }
   }
 
@@ -32,7 +34,9 @@ object JWKThumbprint extends JWKJsonImplicits {
   ): Either[JWKThumbprintError, Base64String] = {
     for {
       v <- getDigest(json, hashAlg)
-      r <- Base64StringFactory(urlSafe = true, isNoPadding = true).encode(v).leftMap(error => JWKThumbprintError(error.message))
+      r <- Base64StringFactory(urlSafe = true, isNoPadding = true)
+        .encode(v)
+        .leftMap(error => JWKThumbprintError(error.message))
     } yield r
   }
 

@@ -19,6 +19,10 @@ abstract class JWK(val keyType: KeyType,
                    val expireAt: Option[ZonedDateTime])
     extends Ordered[JWK] {
 
+  require(x509CertificateSHA256Thumbprint.fold(true)(_.urlSafe))
+  require(x509CertificateSHA1Thumbprint.fold(true)(_.urlSafe))
+  require(if (x509CertificateChain.isEmpty) true else x509CertificateChain.forall(_.urlSafe))
+
   require(
     publicKeyUseType.fold(true) { pku =>
       KeyUseAndOpsConsistency.areConsistent(pku, keyOperations)

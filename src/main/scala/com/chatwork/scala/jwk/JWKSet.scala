@@ -1,7 +1,7 @@
 package com.chatwork.scala.jwk
 
 import io.circe.syntax._
-import io.circe.{Decoder, Encoder, Json, parser}
+import io.circe.{parser, Decoder, Encoder, Json}
 import cats.implicits._
 import com.chatwork.scala.jwk.JWKError.JWKSetCreationError
 

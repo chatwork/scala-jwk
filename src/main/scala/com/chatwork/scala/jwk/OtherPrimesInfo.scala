@@ -7,6 +7,10 @@ case class OtherPrimesInfo(
     d: Base64String,
     t: Base64String
 ) {
+  require(r.urlSafe)
+  require(d.urlSafe)
+  require(t.urlSafe)
+
   val primeFactor          = r
   val factorCRTExponent    = d
   val factorCRTCoefficient = t
