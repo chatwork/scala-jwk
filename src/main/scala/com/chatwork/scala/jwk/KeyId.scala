@@ -12,7 +12,7 @@ case class KeyId(value: String)
 
 object KeyId extends KeyIdJsonImplicits with Base64StringJsonImplicits {
 
-  val base64StringFactory = Base64StringFactory(true, true)
+  val base64StringFactory = Base64StringFactory(urlSafe = true, isNoPadding = true)
 
   def fromRSAPublicKeyParams(modulus: Base64String,
                              publicExponent: Base64String): Either[JWKThumbprintError, KeyId] = {

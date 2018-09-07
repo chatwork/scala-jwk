@@ -45,7 +45,7 @@ libraryDependencies ++= Seq(
   Cats.v1_1_0,
   Enumeratum.latest,
   Scala.java8Compat,
-  "com.github.j5ik2o" %% "base64scala" % "1.0.0"
+  "com.github.j5ik2o" %% "base64scala" % "1.0.3"
 ) ++ Seq(
   "io.circe" %% "circe-core",
   "io.circe" %% "circe-generic",

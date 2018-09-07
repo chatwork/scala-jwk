@@ -6,7 +6,7 @@ import java.security.{MessageDigest, NoSuchAlgorithmException}
 import io.circe.Json
 import io.circe.syntax._
 import cats.implicits._
-import com.chatwork.scala.jwk.JWKError.JWKThumbprintError
+import com.chatwork.scala.jwk.JWKError.{Cause, JWKThumbprintError}
 import com.github.j5ik2o.base64scala.{Base64String, Base64StringFactory}
 
 object JWKThumbprint extends JWKJsonImplicits {
@@ -22,7 +22,7 @@ object JWKThumbprint extends JWKJsonImplicits {
       Right(md.digest())
     } catch {
       case ex: NoSuchAlgorithmException =>
-        Left(JWKThumbprintError("Couldn't compute JWK thumbprint: Unsupported hash algorithm: " + ex.getMessage))
+        Left(JWKThumbprintError("Couldn't compute JWK thumbprint: Unsupported hash algorithm: " + ex.getMessage, Some(Cause(ex))))
     }
   }
 

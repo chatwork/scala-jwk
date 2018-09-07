@@ -6,9 +6,9 @@ object JWKPrinter {
 
   val noSpaces: Printer = Printer(
     preserveOrder = true,
-    dropNullKeys = true,
+    dropNullValues = true,
     indent = ""
   )
 
-  val space2 = Printer.spaces2.copy(dropNullKeys = true)
+  val space2 = Printer.spaces2.copy(dropNullValues = true)
 }

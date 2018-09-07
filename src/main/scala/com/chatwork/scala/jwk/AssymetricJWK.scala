@@ -1,13 +1,15 @@
 package com.chatwork.scala.jwk
 
-import java.security.{ KeyPair, PrivateKey, PublicKey }
+import java.security.{KeyPair, PrivateKey, PublicKey}
+
+import com.chatwork.scala.jwk.JWKError.{RSAKeyCreationError, RSAPrivateKeyCreationError, RSAPublicKeyCreationError}
 
 trait AssymetricJWK {
 
-  def toPublicKey: Either[JWKError, PublicKey]
+  def toPublicKey: Either[RSAPublicKeyCreationError, PublicKey]
 
-  def toPrivateKey: Either[JWKError, PrivateKey]
+  def toPrivateKey: Either[RSAPrivateKeyCreationError, PrivateKey]
 
-  def toKeyPair: Either[JWKError, KeyPair]
+  def toKeyPair: Either[RSAKeyCreationError, KeyPair]
 
 }

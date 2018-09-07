@@ -14,10 +14,14 @@ object JWKError {
 
   case class JWKSetCreationError(message: String, cause: Option[JWKError] = None) extends JWKError
 
-  case class RSAPrivateKeyCreationError(message: String, cause: Option[JWKError] = None) extends JWKError
+  sealed trait RSAKeyCreationError extends JWKError
 
-  case class RSAPublicKeyCreationError(message: String, cause: Option[JWKError] = None) extends JWKError
+  case class RSAPrivateKeyCreationError(message: String, cause: Option[JWKError] = None) extends RSAKeyCreationError
+
+  case class RSAPublicKeyCreationError(message: String, cause: Option[JWKError] = None) extends RSAKeyCreationError
 
   case class JWKThumbprintError(message: String, cause: Option[JWKError] = None) extends JWKError
+
+  case class Cause(throwable: Throwable) extends JWKError
 
 }
