@@ -7,3 +7,4 @@ trait JsonImplicits
     with PublicKeyUseJsonImplicits
     with KeyOperationsJsonImplicits
     with Base64StringJsonImplicits
+    with URIJsonImplicits
