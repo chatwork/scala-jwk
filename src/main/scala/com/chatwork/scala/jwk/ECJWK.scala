@@ -219,24 +219,6 @@ class ECJWK private[jwk] (val curve: Curve,
     }
   }
 
-  def toKeyPair(provider: Option[Provider]): Either[KeyCreationError, Option[KeyPair]] = {
-    privateKey
-      .map { privKey =>
-        toECPublicKey(provider).map { pubKey =>
-          Option(new KeyPair(pubKey, privKey))
-        }
-      }
-      .getOrElse {
-        for {
-          pubKey     <- toECPublicKey(provider)
-          privKeyOpt <- toECPrivateKey(provider)
-        } yield
-          privKeyOpt.map { pko =>
-            new KeyPair(pubKey, pko)
-          }
-      }
-  }
-
   override def getRequiredParams: Map[String, Any] = Map(
     "crv" -> curve.name,
     "kty" -> keyType.entryName,
@@ -281,7 +263,11 @@ class ECJWK private[jwk] (val curve: Curve,
     } yield result
   }
 
-  override def toKeyPair: Either[KeyCreationError, KeyPair] = toKeyPair(None).map(_.get)
+  override def toKeyPair: Either[KeyCreationError, KeyPair] =
+    for {
+      publicKey  <- toECPublicKey()
+      privateKey <- toPrivateKey
+    } yield new KeyPair(publicKey, privateKey)
 
   override def compare(that: JWK): Int = super.compareTo(that)
 
@@ -305,23 +291,21 @@ class ECJWK private[jwk] (val curve: Curve,
   }
 
   override def toString =
-    (
-      Seq(
-        curve,
-        x,
-        y,
-        keyType,
-        publicKeyUseType,
-        keyOperations,
-        algorithmType,
-        keyId,
-        x509Url,
-        x509CertificateSHA256Thumbprint,
-        x509CertificateSHA1Thumbprint,
-        x509CertificateChain,
-        d,
-        privateKey
-      )
+    Seq(
+      curve,
+      x,
+      y,
+      keyType,
+      publicKeyUseType,
+      keyOperations,
+      algorithmType,
+      keyId,
+      x509Url,
+      x509CertificateSHA256Thumbprint,
+      x509CertificateSHA1Thumbprint,
+      x509CertificateChain,
+      d,
+      privateKey
     ).mkString("ECJWK(", ",", ")")
 
 }

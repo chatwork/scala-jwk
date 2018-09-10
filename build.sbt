@@ -48,7 +48,7 @@ libraryDependencies ++= Seq(
   J5ik2o.base64scala,
   Circe.core,
   Circe.generic,
-  Circe.parser,
+  Circe.parser
 )
 
 updateOptions := updateOptions.value.withCachedResolution(true)
