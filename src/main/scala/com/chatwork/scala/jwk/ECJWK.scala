@@ -285,6 +285,45 @@ class ECJWK private[jwk] (val curve: Curve,
 
   override def compare(that: JWK): Int = super.compareTo(that)
 
+  override def canEqual(other: Any): Boolean = other.isInstanceOf[ECJWK]
+
+  override def equals(other: Any): Boolean = other match {
+    case that: ECJWK =>
+      super.equals(that) &&
+      (that canEqual this) &&
+      curve == that.curve &&
+      x == that.x &&
+      y == that.y &&
+      d == that.d &&
+      privateKey == that.privateKey
+    case _ => false
+  }
+
+  override def hashCode(): Int = {
+    val state = Seq(curve, x, y, d, privateKey)
+    state.map(_.hashCode()).foldLeft(super.hashCode())((a, b) => 31 * a + b)
+  }
+
+  override def toString =
+    (
+      Seq(
+        curve,
+        x,
+        y,
+        keyType,
+        publicKeyUseType,
+        keyOperations,
+        algorithmType,
+        keyId,
+        x509Url,
+        x509CertificateSHA256Thumbprint,
+        x509CertificateSHA1Thumbprint,
+        x509CertificateChain,
+        d,
+        privateKey
+      )
+    ).mkString("ECJWK(", ",", ")")
+
 }
 
 trait ECJWKJsonImplicits extends JsonImplicits {
