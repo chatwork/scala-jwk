@@ -2,7 +2,11 @@ package com.chatwork.scala.jwk
 
 import io.circe.{Decoder, Encoder}
 
-case class KeyOperations(breachEncapsulationOfValues: Seq[KeyOperationType])
+case class KeyOperations(breachEncapsulationOfValues: Seq[KeyOperationType]) {
+  def isEmpty: Boolean                           = breachEncapsulationOfValues.isEmpty
+  def nonEmpty: Boolean                          = !isEmpty
+  def contains(value: KeyOperationType): Boolean = breachEncapsulationOfValues.contains(value)
+}
 
 object KeyOperations {
 

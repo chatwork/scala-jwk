@@ -3,7 +3,7 @@ package com.chatwork.scala.jwk
 import io.circe.syntax._
 import io.circe.{parser, Decoder, Encoder, Json}
 import cats.implicits._
-import com.chatwork.scala.jwk.JWKError.JWKSetCreationError
+import com.chatwork.scala.jwk.JWKError.{JOSEError, JWKSetCreationError}
 
 import scala.collection.immutable.SortedSet
 
@@ -11,6 +11,19 @@ case class JWKSet(breachEncapsulationOfValues: SortedSet[JWK]) {
 
   def keyByKeyId(keyId: String): Option[JWK] = {
     breachEncapsulationOfValues.find(_.keyId.contains(keyId))
+  }
+
+  def select(matcher: JWKMatcher): Either[JOSEError, Seq[JWK]] = {
+    if (breachEncapsulationOfValues.isEmpty) {
+      Right(Seq.empty)
+    } else {
+      breachEncapsulationOfValues.foldLeft[Either[JOSEError, Seq[JWK]]](Right(Seq.empty[JWK])) { (result, element) =>
+        for {
+          r <- result
+          e <- matcher.matches(element)
+        } yield if (e) r :+ element else r
+      }
+    }
   }
 
   def size: Int = breachEncapsulationOfValues.size

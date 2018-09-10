@@ -1,6 +1,7 @@
 package com.chatwork.scala.jwk
 
 import java.net.URI
+import java.security.KeyStore
 import java.time.ZonedDateTime
 
 import com.chatwork.scala.jwk.JWKError.{JOSEError, JWKThumbprintError}
@@ -16,7 +17,8 @@ abstract class JWK(val keyType: KeyType,
                    val x509CertificateSHA256Thumbprint: Option[Base64String],
                    val x509CertificateSHA1Thumbprint: Option[Base64String],
                    val x509CertificateChain: List[Base64String],
-                   val expireAt: Option[ZonedDateTime])
+                   val expireAt: Option[ZonedDateTime],
+                   val keyStore: Option[KeyStore])
     extends Ordered[JWK] {
 
   require(x509CertificateSHA256Thumbprint.fold(true)(_.urlSafe))
