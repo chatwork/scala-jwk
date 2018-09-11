@@ -88,12 +88,14 @@ abstract class JWK(val keyType: KeyType,
 
 }
 
-trait JWKJsonImplicits extends RSAJWKJsonImplicits {
+trait JWKJsonImplicits extends RSAJWKJsonImplicits with ECJWKJsonImplicits {
 
   import io.circe.syntax._
 
   implicit val JWKJsonEncoder: Encoder[JWK] = Encoder.instance {
     case v: RSAJWK =>
+      v.asJson
+    case v: ECJWK =>
       v.asJson
     case _ =>
       throw new AssertionError("Unsupported Other KeyType")
@@ -103,6 +105,8 @@ trait JWKJsonImplicits extends RSAJWKJsonImplicits {
     hcursor.get[KeyType]("kty").flatMap {
       case KeyType.RSA =>
         RSAJWKJsonDecoder(hcursor)
+      case KeyType.EC =>
+        ECJWKJsonDecoder(hcursor)
       case _ =>
         throw new AssertionError("Unsupported Other KeyType")
     }
