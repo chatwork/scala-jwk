@@ -101,10 +101,10 @@ object ECJWK extends ECJWKJsonImplicits {
     } yield jwk
   }
 
-  private val SUPPORTED_CURVES = Set(Curve.P_256, Curve.P_384, Curve.P_521)
+  val SUPPORTED_CURVES = Set(Curve.P_256, Curve.P_256K, Curve.P_384, Curve.P_521)
 
   private def ensurePublicCoordinatesOnCurve(curve: Curve, x: Base64String, y: Base64String) = {
-    require(!SUPPORTED_CURVES.contains(curve), "Unknown / unsupported curve: " + curve)
+    require(SUPPORTED_CURVES.contains(curve), "Unknown / unsupported curve: " + curve)
     val result = for {
       dx <- x.decodeToBigInt
       dy <- y.decodeToBigInt
@@ -115,7 +115,7 @@ object ECJWK extends ECJWKJsonImplicits {
         curve.toECParameterSpec.getOrElse(throw new IllegalArgumentException("Unknown curve instance."))
       )
 
-    if (!result.isLeft)
+    if (result.isLeft)
       throw new IllegalArgumentException(
         "Invalid EC JWK: The 'x' and 'y' public coordinates are not on the " + curve + " curve"
       )
@@ -337,7 +337,7 @@ trait ECJWKJsonImplicits extends JsonImplicits {
   implicit val ECJWKJsonDecoder: Decoder[ECJWK] = Decoder.instance { hcursor =>
     for {
       _ <- hcursor.get[KeyType]("kty").flatMap { v =>
-        if (v == KeyType.RSA) Right(v) else Left(DecodingFailure("Invalid key type", hcursor.history))
+        if (v == KeyType.EC) Right(v) else Left(DecodingFailure("Invalid key type", hcursor.history))
       }
       use    <- hcursor.get[Option[PublicKeyUseType]]("use")
       ops    <- hcursor.getOrElse[KeyOperations]("ops")(KeyOperations.empty)

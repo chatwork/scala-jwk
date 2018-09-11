@@ -1,4 +1,3 @@
-
 sonatypeProfileName := "com.chatwork"
 
 organization := "com.chatwork"
@@ -40,7 +39,7 @@ resolvers ++= Seq(
 )
 
 libraryDependencies ++= Seq(
-  ScalaTest.v3_0_1 % Test,
+  ScalaTest.v3_0_1      % Test,
   ScalaCheck.scalaCheck % Test,
   Cats.v1_1_0,
   Enumeratum.latest,
@@ -55,7 +54,7 @@ updateOptions := updateOptions.value.withCachedResolution(true)
 
 parallelExecution in Test := false
 
-javaOptions in(Test, run) ++= Seq("-Xms4g", "-Xmx4g", "-Xss10M", "-XX:+CMSClassUnloadingEnabled")
+javaOptions in (Test, run) ++= Seq("-Xms4g", "-Xmx4g", "-Xss10M", "-XX:+CMSClassUnloadingEnabled")
 
 publishMavenStyle := true
 
