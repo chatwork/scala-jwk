@@ -6,9 +6,10 @@ import java.security.spec.RSAPublicKeySpec
 import java.util.UUID
 
 import com.github.j5ik2o.base64scala.Base64String
-import org.scalatest.FreeSpec
+import org.scalatest.{FreeSpec, Matchers}
+import cats.syntax.either._
 
-class KeyIdSpec extends FreeSpec {
+class KeyIdSpec extends FreeSpec with Matchers {
 
   private val n = "0vx7agoebGcQSuuPiLJXZptN9nndrQmbXEps2aiAFbWhM78LhWx" +
   "4cbbfAAtVT86zwu1RK7aPFFxuhDR1L6tSoc_BJECPebWKRXjBZCiFV4n3oknjhMs" +
@@ -29,7 +30,7 @@ class KeyIdSpec extends FreeSpec {
       val result =
         KeyId.fromRSAPublicKeyParams(Base64String(n, urlSafe = true), Base64String(e, urlSafe = true))
       println(result)
-      assert(result === Right(KeyId("zxHHCn6NUeqNxYOKWGV8kyUkgPOuwpIIF8_Fj0aaIIo")))
+      result shouldBe Right(KeyId("zxHHCn6NUeqNxYOKWGV8kyUkgPOuwpIIF8_Fj0aaIIo"))
     }
     "should be able to create from RSA PublicKey" in {
       val keyId = for {
@@ -41,7 +42,7 @@ class KeyIdSpec extends FreeSpec {
           KeyId.fromRSAPublicKey(factory.generatePublic(keySpec).asInstanceOf[RSAPublicKey])
         }
       } yield result
-      assert(keyId === Right(KeyId("zxHHCn6NUeqNxYOKWGV8kyUkgPOuwpIIF8_Fj0aaIIo")))
+      keyId shouldBe Right(KeyId("zxHHCn6NUeqNxYOKWGV8kyUkgPOuwpIIF8_Fj0aaIIo"))
     }
   }
 }

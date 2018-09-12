@@ -8,9 +8,10 @@ import java.security.{KeyFactory, KeyPairGenerator}
 import com.github.j5ik2o.base64scala.{Base64String, Base64StringFactory}
 import io.circe.parser._
 import io.circe.syntax._
-import org.scalatest.FreeSpec
+import org.scalatest.{FreeSpec, Matchers}
+import cats.syntax.either._
 
-class RSAJWKSpec extends FreeSpec with RSAJWKJsonImplicits {
+class RSAJWKSpec extends FreeSpec with Matchers with RSAJWKJsonImplicits {
   val base64StringFactory = Base64StringFactory(urlSafe = true, isNoPadding = true)
   private val n = "0vx7agoebGcQSuuPiLJXZptN9nndrQmbXEps2aiAFbWhM78LhWx" +
   "4cbbfAAtVT86zwu1RK7aPFFxuhDR1L6tSoc_BJECPebWKRXjBZCiFV4n3oknjhMs" +
@@ -85,56 +86,56 @@ class RSAJWKSpec extends FreeSpec with RSAJWKJsonImplicits {
         privateKey = Some(privateKey.fold(_ => null, identity))
       )
 
-      assert(key.publicKeyUseType === Some(PublicKeyUseType.Signature))
-      assert(key.keyOperations === KeyOperations.empty)
-      assert(key.algorithmType === Some(JWSAlgorithmType.RS256))
-      assert(key.keyId === Some(KeyId("1")))
-      assert(key.x509Url === Some(x5u))
-      assert(key.x509CertificateSHA1Thumbprint === Some(x5t))
-      assert(key.x509CertificateSHA256Thumbprint === Some(x5t256))
-      assert(key.x509CertificateChain === x5c)
-      assert(key.x509CertificateChain.length === x5c.length)
+      key.publicKeyUseType shouldBe Some(PublicKeyUseType.Signature)
+      key.keyOperations shouldBe KeyOperations.empty
+      key.algorithmType shouldBe Some(JWSAlgorithmType.RS256)
+      key.keyId shouldBe Some(KeyId("1"))
+      key.x509Url shouldBe Some(x5u)
+      key.x509CertificateSHA1Thumbprint shouldBe Some(x5t)
+      key.x509CertificateSHA256Thumbprint shouldBe Some(x5t256)
+      key.x509CertificateChain shouldBe x5c
+      key.x509CertificateChain.length shouldBe x5c.length
 
-      assert(key.modulus === Base64String(n, urlSafe = true))
-      assert(key.publicExponent === Base64String(e, urlSafe = true))
+      key.modulus shouldBe Base64String(n, urlSafe = true)
+      key.publicExponent shouldBe Base64String(e, urlSafe = true)
 
-      assert(key.privateExponent === Some(Base64String(d, urlSafe = true)))
+      key.privateExponent shouldBe Some(Base64String(d, urlSafe = true))
 
-      assert(key.firstPrimeFactor === Some(Base64String(p, urlSafe = true)))
-      assert(key.secondPrimeFactor === Some(Base64String(q, urlSafe = true)))
+      key.firstPrimeFactor shouldBe Some(Base64String(p, urlSafe = true))
+      key.secondPrimeFactor shouldBe Some(Base64String(q, urlSafe = true))
 
-      assert(key.firstFactorCRTExponent === Some(Base64String(dp, urlSafe = true)))
-      assert(key.secondFactorCRTExponent === Some(Base64String(dq, urlSafe = true)))
+      key.firstFactorCRTExponent shouldBe Some(Base64String(dp, urlSafe = true))
+      key.secondFactorCRTExponent shouldBe Some(Base64String(dq, urlSafe = true))
 
-      assert(key.firstCRTCoefficient === Some(Base64String(qi, urlSafe = true)))
+      key.firstCRTCoefficient shouldBe Some(Base64String(qi, urlSafe = true))
 
       println(key.asJson.spaces2)
 
-      assert(key.isPrivate)
+      key.isPrivate shouldBe true
 
       val publicKey = key.toPublicJWK
-      assert(publicKey.publicKeyUseType === Some(PublicKeyUseType.Signature))
-      assert(publicKey.keyOperations === KeyOperations.empty)
-      assert(publicKey.algorithmType === Some(JWSAlgorithmType.RS256))
-      assert(publicKey.keyId === Some(KeyId("1")))
-      assert(publicKey.x509Url === Some(x5u))
-      assert(publicKey.x509CertificateSHA1Thumbprint === Some(x5t))
-      assert(publicKey.x509CertificateSHA256Thumbprint === Some(x5t256))
-      assert(publicKey.x509CertificateChain === x5c)
-      assert(publicKey.x509CertificateChain.length === x5c.length)
+      publicKey.publicKeyUseType shouldBe Some(PublicKeyUseType.Signature)
+      publicKey.keyOperations shouldBe KeyOperations.empty
+      publicKey.algorithmType shouldBe Some(JWSAlgorithmType.RS256)
+      publicKey.keyId shouldBe Some(KeyId("1"))
+      publicKey.x509Url shouldBe Some(x5u)
+      publicKey.x509CertificateSHA1Thumbprint shouldBe Some(x5t)
+      publicKey.x509CertificateSHA256Thumbprint shouldBe Some(x5t256)
+      publicKey.x509CertificateChain shouldBe x5c
+      publicKey.x509CertificateChain.length shouldBe x5c.length
 
-      assert(publicKey.modulus === Base64String(n, urlSafe = true))
-      assert(publicKey.publicExponent === Base64String(e, urlSafe = true))
+      publicKey.modulus shouldBe Base64String(n, urlSafe = true)
+      publicKey.publicExponent shouldBe Base64String(e, urlSafe = true)
 
-      assert(publicKey.privateExponent === None)
+      publicKey.privateExponent shouldBe None
 
-      assert(publicKey.firstPrimeFactor === None)
-      assert(publicKey.secondPrimeFactor === None)
+      publicKey.firstPrimeFactor shouldBe None
+      publicKey.secondPrimeFactor shouldBe None
 
-      assert(publicKey.firstFactorCRTExponent === None)
-      assert(publicKey.secondFactorCRTExponent === None)
+      publicKey.firstFactorCRTExponent shouldBe None
+      publicKey.secondFactorCRTExponent shouldBe None
 
-      assert(publicKey.firstCRTCoefficient === None)
+      publicKey.firstCRTCoefficient shouldBe None
 
     }
     "should be able to export & import RSAPublicKey" in {
@@ -143,15 +144,15 @@ class RSAJWKSpec extends FreeSpec with RSAJWKJsonImplicits {
         e = Base64String(e, urlSafe = true)
       )
       val pubKey = key.toRSAPublicKey
-      assert(pubKey.map(_.getModulus) === Base64String(n, urlSafe = true).decodeToBigInt.map(_.bigInteger))
-      assert(pubKey.map(_.getPublicExponent) === Base64String(e, urlSafe = true).decodeToBigInt.map(_.bigInteger))
-      assert(pubKey.map(_.getAlgorithm) === Right("RSA"))
+      pubKey.map(_.getModulus) shouldBe Base64String(n, urlSafe = true).decodeToBigInt.map(_.bigInteger)
+      pubKey.map(_.getPublicExponent) shouldBe Base64String(e, urlSafe = true).decodeToBigInt.map(_.bigInteger)
+      pubKey.map(_.getAlgorithm) shouldBe Right("RSA")
 
       val key2 = pubKey.flatMap { key =>
         RSAJWK.fromRSAPublicKey(key)
       }
-      assert(key2.map(_.modulus) === Right(Base64String(n, urlSafe = true)))
-      assert(key2.map(_.publicExponent) === Right(Base64String(e, urlSafe = true)))
+      key2.map(_.modulus) shouldBe Right(Base64String(n, urlSafe = true))
+      key2.map(_.publicExponent) shouldBe Right(Base64String(e, urlSafe = true))
 
     }
     "should be able to export & import RSAPrivateKey" in {
@@ -176,85 +177,49 @@ class RSAJWKSpec extends FreeSpec with RSAJWKJsonImplicits {
 
       // Private key export with CRT (2nd form)
       val privKey1 = key.toRSAPrivateKey
-      assert(
-        privKey1.map(_.map(_.getModulus)) === Base64String(n, urlSafe = true).decodeToBigInt
-          .map(e => Some(e.bigInteger))
-      )
-      assert(
-        privKey1.map(_.map(_.getPrivateExponent)) === Base64String(d, urlSafe = true).decodeToBigInt
-          .map(e => Some(e.bigInteger))
-      )
-      assert(privKey1.exists(_.fold(false)(_.isInstanceOf[RSAPrivateCrtKey])))
+      privKey1.map(_.map(_.getModulus)) shouldBe Base64String(n, urlSafe = true).decodeToBigInt
+        .map(e => Some(e.bigInteger))
+      privKey1.map(_.map(_.getPrivateExponent)) shouldBe Base64String(d, urlSafe = true).decodeToBigInt
+        .map(e => Some(e.bigInteger))
+      privKey1.exists(_.fold(false)(_.isInstanceOf[RSAPrivateCrtKey]))
       val privCrtKey = privKey1.map(_.map(_.asInstanceOf[RSAPrivateCrtKey]))
-      assert(
-        privCrtKey.map(_.map(_.getPublicExponent)) === Base64String(e, urlSafe = true).decodeToBigInt
-          .map(e => Some(e.bigInteger))
-      )
-      assert(
-        privCrtKey.map(_.map(_.getPrimeP)) === Base64String(p, urlSafe = true).decodeToBigInt
-          .map(e => Some(e.bigInteger))
-      )
-      assert(
-        privCrtKey.map(_.map(_.getPrimeQ)) === Base64String(q, urlSafe = true).decodeToBigInt
-          .map(e => Some(e.bigInteger))
-      )
-      assert(
-        privCrtKey.map(_.map(_.getPrimeExponentP)) === Base64String(dp, urlSafe = true).decodeToBigInt
-          .map(e => Some(e.bigInteger))
-      )
-      assert(
-        privCrtKey.map(_.map(_.getPrimeExponentQ)) === Base64String(dq, urlSafe = true).decodeToBigInt
-          .map(e => Some(e.bigInteger))
-      )
-      assert(
-        privCrtKey.map(_.map(_.getCrtCoefficient)) === Base64String(qi, urlSafe = true).decodeToBigInt
-          .map(e => Some(e.bigInteger))
-      )
+      privCrtKey.map(_.map(_.getPublicExponent)) shouldBe Base64String(e, urlSafe = true).decodeToBigInt
+        .map(e => Some(e.bigInteger))
+      privCrtKey.map(_.map(_.getPrimeP)) shouldBe Base64String(p, urlSafe = true).decodeToBigInt
+        .map(e => Some(e.bigInteger))
+      privCrtKey.map(_.map(_.getPrimeQ)) shouldBe Base64String(q, urlSafe = true).decodeToBigInt
+        .map(e => Some(e.bigInteger))
+      privCrtKey.map(_.map(_.getPrimeExponentP)) shouldBe Base64String(dp, urlSafe = true).decodeToBigInt
+        .map(e => Some(e.bigInteger))
+      privCrtKey.map(_.map(_.getPrimeExponentQ)) shouldBe Base64String(dq, urlSafe = true).decodeToBigInt
+        .map(e => Some(e.bigInteger))
+      privCrtKey.map(_.map(_.getCrtCoefficient)) shouldBe Base64String(qi, urlSafe = true).decodeToBigInt
+        .map(e => Some(e.bigInteger))
       // Key pair export
       val keyPair = key.toKeyPair
       val pubKey  = keyPair.map(_.getPublic.asInstanceOf[RSAPublicKey])
-      assert(
-        pubKey.map(_.getModulus) === Base64String(n, urlSafe = true).decodeToBigInt
-          .map(_.bigInteger)
-      )
-      assert(
-        pubKey.map(_.getPublicExponent) === Base64String(e, urlSafe = true).decodeToBigInt
-          .map(_.bigInteger)
-      )
+      pubKey.map(_.getModulus) shouldBe Base64String(n, urlSafe = true).decodeToBigInt
+        .map(_.bigInteger)
+      pubKey.map(_.getPublicExponent) shouldBe Base64String(e, urlSafe = true).decodeToBigInt
+        .map(_.bigInteger)
       val privKey2 = keyPair.map(_.getPrivate.asInstanceOf[RSAPrivateKey])
-      assert(
-        privKey2.map(_.getModulus) === Base64String(n, urlSafe = true).decodeToBigInt
-          .map(_.bigInteger)
-      )
-      assert(
-        privKey2.map(_.getPrivateExponent) === Base64String(d, urlSafe = true).decodeToBigInt
-          .map(_.bigInteger)
-      )
+      privKey2.map(_.getModulus) shouldBe Base64String(n, urlSafe = true).decodeToBigInt
+        .map(_.bigInteger)
+      privKey2.map(_.getPrivateExponent) shouldBe Base64String(d, urlSafe = true).decodeToBigInt
+        .map(_.bigInteger)
       val privCrtKey2 = privKey2.map(_.asInstanceOf[RSAPrivateCrtKey])
-      assert(
-        privCrtKey2.map(_.getPublicExponent) === Base64String(e, urlSafe = true).decodeToBigInt
-          .map(_.bigInteger)
-      )
-      assert(
-        privCrtKey2.map(_.getPrimeP) === Base64String(p, urlSafe = true).decodeToBigInt
-          .map(_.bigInteger)
-      )
-      assert(
-        privCrtKey2.map(_.getPrimeQ) === Base64String(q, urlSafe = true).decodeToBigInt
-          .map(_.bigInteger)
-      )
-      assert(
-        privCrtKey2.map(_.getPrimeExponentP) === Base64String(dp, urlSafe = true).decodeToBigInt
-          .map(_.bigInteger)
-      )
-      assert(
-        privCrtKey2.map(_.getPrimeExponentQ) === Base64String(dq, urlSafe = true).decodeToBigInt
-          .map(_.bigInteger)
-      )
-      assert(
-        privCrtKey2.map(_.getCrtCoefficient) === Base64String(qi, urlSafe = true).decodeToBigInt
-          .map(_.bigInteger)
-      )
+      privCrtKey2.map(_.getPublicExponent) shouldBe Base64String(e, urlSafe = true).decodeToBigInt
+        .map(_.bigInteger)
+      privCrtKey2.map(_.getPrimeP) shouldBe Base64String(p, urlSafe = true).decodeToBigInt
+        .map(_.bigInteger)
+      privCrtKey2.map(_.getPrimeQ) shouldBe Base64String(q, urlSafe = true).decodeToBigInt
+        .map(_.bigInteger)
+      privCrtKey2.map(_.getPrimeExponentP) shouldBe Base64String(dp, urlSafe = true).decodeToBigInt
+        .map(_.bigInteger)
+      privCrtKey2.map(_.getPrimeExponentQ) shouldBe Base64String(dq, urlSafe = true).decodeToBigInt
+        .map(_.bigInteger)
+      privCrtKey2.map(_.getCrtCoefficient) shouldBe Base64String(qi, urlSafe = true).decodeToBigInt
+        .map(_.bigInteger)
       // Key pair import, 1st private form
       val key2 = RSAJWK.fromPublicKeyWithPrivateKey(
         rsaPublicKey = pubKey.right.get,
@@ -269,25 +234,25 @@ class RSAJWKSpec extends FreeSpec with RSAJWKJsonImplicits {
         x509CertificateChain = List.empty
       )
 
-      assert(key2.map(_.publicKeyUseType) === Right(Some(PublicKeyUseType.Signature)))
-      assert(key2.map(_.keyOperations) === Right(KeyOperations.empty))
-      assert(key2.map(_.algorithmType) === Right(Some(JWSAlgorithmType.RS256)))
-      assert(key2.map(_.keyId) === Right(Some(KeyId("1"))))
+      key2.map(_.publicKeyUseType) shouldBe Right(Some(PublicKeyUseType.Signature))
+      key2.map(_.keyOperations) shouldBe Right(KeyOperations.empty)
+      key2.map(_.algorithmType) shouldBe Right(Some(JWSAlgorithmType.RS256))
+      key2.map(_.keyId) shouldBe Right(Some(KeyId("1")))
 
-      assert(key2.map(_.modulus) === Right(Base64String(n, urlSafe = true)))
-      assert(key2.map(_.publicExponent) === Right(Base64String(e, urlSafe = true)))
+      key2.map(_.modulus) shouldBe Right(Base64String(n, urlSafe = true))
+      key2.map(_.publicExponent) shouldBe Right(Base64String(e, urlSafe = true))
 
-      assert(key2.map(_.privateExponent) === Right(Some(Base64String(d, urlSafe = true))))
+      key2.map(_.privateExponent) shouldBe Right(Some(Base64String(d, urlSafe = true)))
 
-      assert(key2.fold(_ => false, _.firstPrimeFactor.isEmpty))
-      assert(key2.fold(_ => false, _.secondPrimeFactor.isEmpty))
+      key2.fold(_ => false, _.firstPrimeFactor.isEmpty)
+      key2.fold(_ => false, _.secondPrimeFactor.isEmpty)
 
-      assert(key2.fold(_ => false, _.firstFactorCRTExponent.isEmpty))
-      assert(key2.fold(_ => false, _.secondFactorCRTExponent.isEmpty))
+      key2.fold(_ => false, _.firstFactorCRTExponent.isEmpty)
+      key2.fold(_ => false, _.secondFactorCRTExponent.isEmpty)
 
-      assert(key2.fold(_ => false, _.firstCRTCoefficient.isEmpty))
+      key2.fold(_ => false, _.firstCRTCoefficient.isEmpty)
 
-      assert(key2.fold(_ => false, _.isPrivate))
+      key2.fold(_ => false, _.isPrivate)
 
       // Key pair import, 2nd private form
       val key3 = RSAJWK.fromPublicKeyWithPrivateCrtKey(
@@ -303,39 +268,39 @@ class RSAJWKSpec extends FreeSpec with RSAJWKJsonImplicits {
         x509CertificateChain = List.empty
       )
 
-      assert(key3.map(_.publicKeyUseType) === Right(Some(PublicKeyUseType.Signature)))
-      assert(key3.map(_.keyOperations) === Right(KeyOperations.empty))
-      assert(key3.map(_.algorithmType) === Right(Some(JWSAlgorithmType.RS256)))
-      assert(key3.map(_.keyId) === Right(Some(KeyId("1"))))
+      key3.map(_.publicKeyUseType) shouldBe Right(Some(PublicKeyUseType.Signature))
+      key3.map(_.keyOperations) shouldBe Right(KeyOperations.empty)
+      key3.map(_.algorithmType) shouldBe Right(Some(JWSAlgorithmType.RS256))
+      key3.map(_.keyId) shouldBe Right(Some(KeyId("1")))
 
-      assert(key3.map(_.modulus) === Right(Base64String(n, urlSafe = true)))
-      assert(key3.map(_.publicExponent) === Right(Base64String(e, urlSafe = true)))
+      key3.map(_.modulus) shouldBe Right(Base64String(n, urlSafe = true))
+      key3.map(_.publicExponent) shouldBe Right(Base64String(e, urlSafe = true))
 
-      assert(key3.map(_.privateExponent) === Right(Some(Base64String(d, urlSafe = true))))
+      key3.map(_.privateExponent) shouldBe Right(Some(Base64String(d, urlSafe = true)))
 
-      assert(key3.map(_.firstPrimeFactor) === Right(Some(Base64String(p, urlSafe = true))))
-      assert(key3.map(_.secondPrimeFactor) === Right(Some(Base64String(q, urlSafe = true))))
+      key3.map(_.firstPrimeFactor) shouldBe Right(Some(Base64String(p, urlSafe = true)))
+      key3.map(_.secondPrimeFactor) shouldBe Right(Some(Base64String(q, urlSafe = true)))
 
-      assert(key3.map(_.firstFactorCRTExponent) === Right(Some(Base64String(dp, urlSafe = true))))
-      assert(key3.map(_.secondFactorCRTExponent) === Right(Some(Base64String(dq, urlSafe = true))))
+      key3.map(_.firstFactorCRTExponent) shouldBe Right(Some(Base64String(dp, urlSafe = true)))
+      key3.map(_.secondFactorCRTExponent) shouldBe Right(Some(Base64String(dq, urlSafe = true)))
 
-      assert(key3.map(_.firstCRTCoefficient) === Right(Some(Base64String(qi, urlSafe = true))))
+      key3.map(_.firstCRTCoefficient) shouldBe Right(Some(Base64String(qi, urlSafe = true)))
 
-      assert(key2.fold(_ => false, _.isPrivate))
+      key2.fold(_ => false, _.isPrivate)
     }
     "should be able to export & import PublicKey" in {
       val key = new RSAJWK(n = Base64String(n, urlSafe = true), e = Base64String(e, urlSafe = true))
-      assert(key.isInstanceOf[AssymetricJWK])
+      key.isInstanceOf[AssymetricJWK]
       val pubKey = key.toPublicKey.map(_.asInstanceOf[RSAPublicKey])
-      assert(pubKey.map(_.getModulus) === Base64String(n, urlSafe = true).decodeToBigInt.map(_.bigInteger))
-      assert(pubKey.map(_.getPublicExponent) === Base64String(e, urlSafe = true).decodeToBigInt.map(_.bigInteger))
-      assert(pubKey.map(_.getAlgorithm) === Right("RSA"))
+      pubKey.map(_.getModulus) shouldBe Base64String(n, urlSafe = true).decodeToBigInt.map(_.bigInteger)
+      pubKey.map(_.getPublicExponent) shouldBe Base64String(e, urlSafe = true).decodeToBigInt.map(_.bigInteger)
+      pubKey.map(_.getAlgorithm) shouldBe Right("RSA")
 
       val key2 = pubKey.flatMap { key =>
         RSAJWK.fromRSAPublicKey(key)
       }
-      assert(key2.map(_.modulus) === Right(Base64String(n, urlSafe = true)))
-      assert(key2.map(_.publicExponent) === Right(Base64String(e, urlSafe = true)))
+      key2.map(_.modulus) shouldBe Right(Base64String(n, urlSafe = true))
+      key2.map(_.publicExponent) shouldBe Right(Base64String(e, urlSafe = true))
     }
     "should be able to export PrivateKey" in {
       val key = new RSAJWK(
@@ -356,37 +321,23 @@ class RSAJWKSpec extends FreeSpec with RSAJWKJsonImplicits {
         dq = Some(Base64String(dq, urlSafe = true)),
         qi = Some(Base64String(qi, urlSafe = true))
       )
-      assert(key.isInstanceOf[AssymetricJWK])
+      key.isInstanceOf[AssymetricJWK]
       val privKey1 = key.toPrivateKey.map(_.asInstanceOf[RSAPrivateKey])
-      assert(
-        privKey1.map(_.getModulus) === Base64String(n, urlSafe = true).decodeToBigInt
-          .map(_.bigInteger)
-      )
-      assert(
-        privKey1.map(_.getPrivateExponent) === Base64String(d, urlSafe = true).decodeToBigInt
-          .map(_.bigInteger)
-      )
+      privKey1.map(_.getModulus) shouldBe Base64String(n, urlSafe = true).decodeToBigInt
+        .map(_.bigInteger)
+      privKey1.map(_.getPrivateExponent) shouldBe Base64String(d, urlSafe = true).decodeToBigInt
+        .map(_.bigInteger)
       val privCrtKey = privKey1.map(_.asInstanceOf[RSAPrivateCrtKey])
-      assert(
-        privCrtKey.map(_.getPrimeP) === Base64String(p, urlSafe = true).decodeToBigInt
-          .map(_.bigInteger)
-      )
-      assert(
-        privCrtKey.map(_.getPrimeQ) === Base64String(q, urlSafe = true).decodeToBigInt
-          .map(_.bigInteger)
-      )
-      assert(
-        privCrtKey.map(_.getPrimeExponentP) === Base64String(dp, urlSafe = true).decodeToBigInt
-          .map(_.bigInteger)
-      )
-      assert(
-        privCrtKey.map(_.getPrimeExponentQ) === Base64String(dq, urlSafe = true).decodeToBigInt
-          .map(_.bigInteger)
-      )
-      assert(
-        privCrtKey.map(_.getCrtCoefficient) === Base64String(qi, urlSafe = true).decodeToBigInt
-          .map(_.bigInteger)
-      )
+      privCrtKey.map(_.getPrimeP) shouldBe Base64String(p, urlSafe = true).decodeToBigInt
+        .map(_.bigInteger)
+      privCrtKey.map(_.getPrimeQ) shouldBe Base64String(q, urlSafe = true).decodeToBigInt
+        .map(_.bigInteger)
+      privCrtKey.map(_.getPrimeExponentP) shouldBe Base64String(dp, urlSafe = true).decodeToBigInt
+        .map(_.bigInteger)
+      privCrtKey.map(_.getPrimeExponentQ) shouldBe Base64String(dq, urlSafe = true).decodeToBigInt
+        .map(_.bigInteger)
+      privCrtKey.map(_.getCrtCoefficient) shouldBe Base64String(qi, urlSafe = true).decodeToBigInt
+        .map(_.bigInteger)
     }
     "should be able to parse some key" in {
       val jsonText = "{\n" +
@@ -400,7 +351,7 @@ class RSAJWKSpec extends FreeSpec with RSAJWKJsonImplicits {
         json.as[RSAJWK]
       }
 
-      assert(key.map(_.algorithmType) == Right(Some(JWSAlgorithmType.RS256)))
+      key.map(_.algorithmType) == Right(Some(JWSAlgorithmType.RS256))
     }
     "should be able to key conversion of round trip" in {
       val keyGen = KeyPairGenerator.getInstance("RSA")
@@ -410,57 +361,43 @@ class RSAJWKSpec extends FreeSpec with RSAJWKJsonImplicits {
       val rsaPrivateKeyIn = keyPair.getPrivate.asInstanceOf[RSAPrivateKey]
       val rsaJWK          = RSAJWK.fromKeyPair(rsaPublicKeyIn, rsaPrivateKeyIn)
       // Compare JWK values with original Java RSA values
-      assert(
-        rsaJWK.flatMap(_.publicExponent.decodeToBigInt.map(_.bigInteger)) === Right(rsaPublicKeyIn.getPublicExponent)
+      rsaJWK.flatMap(_.publicExponent.decodeToBigInt.map(_.bigInteger)) shouldBe Right(
+        rsaPublicKeyIn.getPublicExponent
       )
-      assert(
-        rsaJWK.flatMap(_.modulus.decodeToBigInt.map(_.bigInteger)) === Right(rsaPublicKeyIn.getModulus)
-      )
-      assert(
-        rsaJWK.map(_.privateExponent.map(_.decodeToBigInt.map(_.bigInteger))) === Right(
-          Some(Right(rsaPrivateKeyIn.getPrivateExponent))
-        )
+      rsaJWK.flatMap(_.modulus.decodeToBigInt.map(_.bigInteger)) shouldBe Right(rsaPublicKeyIn.getModulus)
+      rsaJWK.map(_.privateExponent.map(_.decodeToBigInt.map(_.bigInteger))) shouldBe Right(
+        Some(Right(rsaPrivateKeyIn.getPrivateExponent))
       )
 
       // Convert back to Java RSA keys
       val rsaPublicKeyOut  = rsaJWK.map(_.toRSAPublicKey)
       val rsaPrivateKeyOut = rsaJWK.map(_.toRSAPrivateKey)
 
-      assert(rsaPublicKeyOut.flatMap(_.map(_.getAlgorithm)) === Right(rsaPublicKeyIn.getAlgorithm))
-      assert(rsaPublicKeyOut.flatMap(_.map(_.getPublicExponent)) === Right(rsaPublicKeyIn.getPublicExponent))
-      assert(rsaPublicKeyOut.flatMap(_.map(_.getModulus)) === Right(rsaPublicKeyIn.getModulus))
+      rsaPublicKeyOut.flatMap(_.map(_.getAlgorithm)) shouldBe Right(rsaPublicKeyIn.getAlgorithm)
+      rsaPublicKeyOut.flatMap(_.map(_.getPublicExponent)) shouldBe Right(rsaPublicKeyIn.getPublicExponent)
+      rsaPublicKeyOut.flatMap(_.map(_.getModulus)) shouldBe Right(rsaPublicKeyIn.getModulus)
 
-      assert(rsaPrivateKeyOut.flatMap(_.map(_.map(_.getAlgorithm))) === Right(Some(rsaPrivateKeyIn.getAlgorithm)))
-      assert(
-        rsaPrivateKeyOut.flatMap(_.map(_.map(_.getPrivateExponent))) === Right(
-          Some(rsaPrivateKeyIn.getPrivateExponent)
-        )
+      rsaPrivateKeyOut.flatMap(_.map(_.map(_.getAlgorithm))) shouldBe Right(Some(rsaPrivateKeyIn.getAlgorithm))
+      rsaPrivateKeyOut.flatMap(_.map(_.map(_.getPrivateExponent))) shouldBe Right(
+        Some(rsaPrivateKeyIn.getPrivateExponent)
       )
 
       // Compare encoded forms
-      assert(
-        base64StringFactory
-          .encode(rsaPublicKeyIn.getEncoded)
-          .map(_.asString) === base64StringFactory
-          .encode(rsaPublicKeyOut.right.get.right.get.getEncoded)
-          .map(_.asString)
-      )
-      assert(
-        base64StringFactory
-          .encode(rsaPrivateKeyIn.getEncoded)
-          .map(_.asString) === base64StringFactory
-          .encode(rsaPrivateKeyOut.right.get.right.get.get.getEncoded)
-          .map(_.asString)
-      )
+      base64StringFactory
+        .encode(rsaPublicKeyIn.getEncoded)
+        .map(_.asString) shouldBe base64StringFactory
+        .encode(rsaPublicKeyOut.right.get.right.get.getEncoded)
+        .map(_.asString)
+      base64StringFactory
+        .encode(rsaPrivateKeyIn.getEncoded)
+        .map(_.asString) shouldBe base64StringFactory
+        .encode(rsaPrivateKeyOut.right.get.right.get.get.getEncoded)
+        .map(_.asString)
       val key2 = RSAJWK.fromKeyPair(rsaPublicKeyOut.right.get.right.get, rsaPrivateKeyOut.right.get.right.get.get)
-      assert(
-        key2.flatMap(_.publicExponent.decodeToBigInt.map(_.bigInteger)) === Right(rsaPublicKeyIn.getPublicExponent)
-      )
-      assert(key2.flatMap(_.modulus.decodeToBigInt.map(_.bigInteger)) === Right(rsaPublicKeyIn.getModulus))
-      assert(
-        key2.map(_.privateExponent.map(_.decodeToBigInt.map(_.bigInteger))) === Right(
-          Some(Right(rsaPrivateKeyIn.getPrivateExponent))
-        )
+      key2.flatMap(_.publicExponent.decodeToBigInt.map(_.bigInteger)) shouldBe Right(rsaPublicKeyIn.getPublicExponent)
+      key2.flatMap(_.modulus.decodeToBigInt.map(_.bigInteger)) shouldBe Right(rsaPublicKeyIn.getModulus)
+      key2.map(_.privateExponent.map(_.decodeToBigInt.map(_.bigInteger))) shouldBe Right(
+        Some(Right(rsaPrivateKeyIn.getPrivateExponent))
       )
     }
     "should be able to parse cookbook example" in {
@@ -507,82 +444,68 @@ class RSAJWKSpec extends FreeSpec with RSAJWKJsonImplicits {
       val jwk = parse(jsonText).flatMap { json =>
         json.as[RSAJWK]
       }
-      assert(jwk.map(_.keyType) === Right(KeyType.RSA))
-      assert(jwk.map(_.keyId) === Right(Some(KeyId("bilbo.baggins@hobbiton.example"))))
-      assert(jwk.map(_.publicKeyUseType) === Right(Some(PublicKeyUseType.Signature)))
-      assert(
-        jwk.map(_.modulus.asString) === Right(
-          "n4EPtAOCc9AlkeQHPzHStgAbgs7bTZLwUBZdR8_KuKPEHLd4rHVTeT" +
-          "-O-XV2jRojdNhxJWTDvNd7nqQ0VEiZQHz_AJmSCpMaJMRBSFKrKb2wqV" +
-          "wGU_NsYOYL-QtiWN2lbzcEe6XC0dApr5ydQLrHqkHHig3RBordaZ6Aj-" +
-          "oBHqFEHYpPe7Tpe-OfVfHd1E6cS6M1FZcD1NNLYD5lFHpPI9bTwJlsde" +
-          "3uhGqC0ZCuEHg8lhzwOHrtIQbS0FVbb9k3-tVTU4fg_3L_vniUFAKwuC" +
-          "LqKnS2BYwdq_mzSnbLY7h_qixoR7jig3__kRhuaxwUkRz5iaiQkqgc5g" +
-          "HdrNP5zw"
+      jwk.map(_.keyType) shouldBe Right(KeyType.RSA)
+      jwk.map(_.keyId) shouldBe Right(Some(KeyId("bilbo.baggins@hobbiton.example")))
+      jwk.map(_.publicKeyUseType) shouldBe Right(Some(PublicKeyUseType.Signature))
+      jwk.map(_.modulus.asString) shouldBe Right(
+        "n4EPtAOCc9AlkeQHPzHStgAbgs7bTZLwUBZdR8_KuKPEHLd4rHVTeT" +
+        "-O-XV2jRojdNhxJWTDvNd7nqQ0VEiZQHz_AJmSCpMaJMRBSFKrKb2wqV" +
+        "wGU_NsYOYL-QtiWN2lbzcEe6XC0dApr5ydQLrHqkHHig3RBordaZ6Aj-" +
+        "oBHqFEHYpPe7Tpe-OfVfHd1E6cS6M1FZcD1NNLYD5lFHpPI9bTwJlsde" +
+        "3uhGqC0ZCuEHg8lhzwOHrtIQbS0FVbb9k3-tVTU4fg_3L_vniUFAKwuC" +
+        "LqKnS2BYwdq_mzSnbLY7h_qixoR7jig3__kRhuaxwUkRz5iaiQkqgc5g" +
+        "HdrNP5zw"
+      )
+      jwk.map(_.publicExponent.asString) shouldBe Right("AQAB")
+      jwk.map(_.privateExponent.map(_.asString)) shouldBe Right(
+        Some(
+          "bWUC9B-EFRIo8kpGfh0ZuyGPvMNKvYWNtB_ikiH9k20eT-O1q_I78e" +
+          "iZkpXxXQ0UTEs2LsNRS-8uJbvQ-A1irkwMSMkK1J3XTGgdrhCku9gRld" +
+          "Y7sNA_AKZGh-Q661_42rINLRCe8W-nZ34ui_qOfkLnK9QWDDqpaIsA-b" +
+          "MwWWSDFu2MUBYwkHTMEzLYGqOe04noqeq1hExBTHBOBdkMXiuFhUq1BU" +
+          "6l-DqEiWxqg82sXt2h-LMnT3046AOYJoRioz75tSUQfGCshWTBnP5uDj" +
+          "d18kKhyv07lhfSJdrPdM5Plyl21hsFf4L_mHCuoFau7gdsPfHPxxjVOc" +
+          "OpBrQzwQ"
         )
       )
-      assert(jwk.map(_.publicExponent.asString) === Right("AQAB"))
-      assert(
-        jwk.map(_.privateExponent.map(_.asString)) === Right(
-          Some(
-            "bWUC9B-EFRIo8kpGfh0ZuyGPvMNKvYWNtB_ikiH9k20eT-O1q_I78e" +
-            "iZkpXxXQ0UTEs2LsNRS-8uJbvQ-A1irkwMSMkK1J3XTGgdrhCku9gRld" +
-            "Y7sNA_AKZGh-Q661_42rINLRCe8W-nZ34ui_qOfkLnK9QWDDqpaIsA-b" +
-            "MwWWSDFu2MUBYwkHTMEzLYGqOe04noqeq1hExBTHBOBdkMXiuFhUq1BU" +
-            "6l-DqEiWxqg82sXt2h-LMnT3046AOYJoRioz75tSUQfGCshWTBnP5uDj" +
-            "d18kKhyv07lhfSJdrPdM5Plyl21hsFf4L_mHCuoFau7gdsPfHPxxjVOc" +
-            "OpBrQzwQ"
-          )
+      jwk.map(_.firstPrimeFactor.map(_.asString)) shouldBe Right(
+        Some(
+          "3Slxg_DwTXJcb6095RoXygQCAZ5RnAvZlno1yhHtnUex_fp7AZ_9nR" +
+          "aO7HX_-SFfGQeutao2TDjDAWU4Vupk8rw9JR0AzZ0N2fvuIAmr_WCsmG" +
+          "peNqQnev1T7IyEsnh8UMt-n5CafhkikzhEsrmndH6LxOrvRJlsPp6Zv8" +
+          "bUq0k"
         )
       )
-      assert(
-        jwk.map(_.firstPrimeFactor.map(_.asString)) === Right(
-          Some(
-            "3Slxg_DwTXJcb6095RoXygQCAZ5RnAvZlno1yhHtnUex_fp7AZ_9nR" +
-            "aO7HX_-SFfGQeutao2TDjDAWU4Vupk8rw9JR0AzZ0N2fvuIAmr_WCsmG" +
-            "peNqQnev1T7IyEsnh8UMt-n5CafhkikzhEsrmndH6LxOrvRJlsPp6Zv8" +
-            "bUq0k"
-          )
+      jwk.map(_.secondPrimeFactor.map(_.asString)) shouldBe Right(
+        Some(
+          "uKE2dh-cTf6ERF4k4e_jy78GfPYUIaUyoSSJuBzp3Cubk3OCqs6grT" +
+          "8bR_cu0Dm1MZwWmtdqDyI95HrUeq3MP15vMMON8lHTeZu2lmKvwqW7an" +
+          "V5UzhM1iZ7z4yMkuUwFWoBvyY898EXvRD-hdqRxHlSqAZ192zB3pVFJ0" +
+          "s7pFc"
         )
       )
-      assert(
-        jwk.map(_.secondPrimeFactor.map(_.asString)) === Right(
-          Some(
-            "uKE2dh-cTf6ERF4k4e_jy78GfPYUIaUyoSSJuBzp3Cubk3OCqs6grT" +
-            "8bR_cu0Dm1MZwWmtdqDyI95HrUeq3MP15vMMON8lHTeZu2lmKvwqW7an" +
-            "V5UzhM1iZ7z4yMkuUwFWoBvyY898EXvRD-hdqRxHlSqAZ192zB3pVFJ0" +
-            "s7pFc"
-          )
+      jwk.map(_.firstFactorCRTExponent.map(_.asString)) shouldBe Right(
+        Some(
+          "B8PVvXkvJrj2L-GYQ7v3y9r6Kw5g9SahXBwsWUzp19TVlgI-YV85q" +
+          "1NIb1rxQtD-IsXXR3-TanevuRPRt5OBOdiMGQp8pbt26gljYfKU_E9xn" +
+          "-RULHz0-ed9E9gXLKD4VGngpz-PfQ_q29pk5xWHoJp009Qf1HvChixRX" +
+          "59ehik"
         )
       )
-      assert(
-        jwk.map(_.firstFactorCRTExponent.map(_.asString)) === Right(
-          Some(
-            "B8PVvXkvJrj2L-GYQ7v3y9r6Kw5g9SahXBwsWUzp19TVlgI-YV85q" +
-            "1NIb1rxQtD-IsXXR3-TanevuRPRt5OBOdiMGQp8pbt26gljYfKU_E9xn" +
-            "-RULHz0-ed9E9gXLKD4VGngpz-PfQ_q29pk5xWHoJp009Qf1HvChixRX" +
-            "59ehik"
-          )
+      jwk.map(_.secondFactorCRTExponent.map(_.asString)) shouldBe Right(
+        Some(
+          "CLDmDGduhylc9o7r84rEUVn7pzQ6PF83Y-iBZx5NT-TpnOZKF1pEr" +
+          "AMVeKzFEl41DlHHqqBLSM0W1sOFbwTxYWZDm6sI6og5iTbwQGIC3gnJK" +
+          "bi_7k_vJgGHwHxgPaX2PnvP-zyEkDERuf-ry4c_Z11Cq9AqC2yeL6kdK" +
+          "T1cYF8"
         )
       )
-      assert(
-        jwk.map(_.secondFactorCRTExponent.map(_.asString)) === Right(
-          Some(
-            "CLDmDGduhylc9o7r84rEUVn7pzQ6PF83Y-iBZx5NT-TpnOZKF1pEr" +
-            "AMVeKzFEl41DlHHqqBLSM0W1sOFbwTxYWZDm6sI6og5iTbwQGIC3gnJK" +
-            "bi_7k_vJgGHwHxgPaX2PnvP-zyEkDERuf-ry4c_Z11Cq9AqC2yeL6kdK" +
-            "T1cYF8"
-          )
-        )
-      )
-      assert(
-        jwk.map(_.firstCRTCoefficient.map(_.asString)) === Right(
-          Some(
-            "3PiqvXQN0zwMeE-sBvZgi289XP9XCQF3VWqPzMKnIgQp7_Tugo6-N" +
-            "ZBKCQsMf3HaEGBjTVJs_jcK8-TRXvaKe-7ZMaQj8VfBdYkssbu0NKDDh" +
-            "jJ-GtiseaDVWt7dcH0cfwxgFUHpQh7FoCrjFJ6h6ZEpMF6xmujs4qMpP" +
-            "z8aaI4"
-          )
+      jwk.map(_.firstCRTCoefficient.map(_.asString)) shouldBe Right(
+        Some(
+          "3PiqvXQN0zwMeE-sBvZgi289XP9XCQF3VWqPzMKnIgQp7_Tugo6-N" +
+          "ZBKCQsMf3HaEGBjTVJs_jcK8-TRXvaKe-7ZMaQj8VfBdYkssbu0NKDDh" +
+          "jJ-GtiseaDVWt7dcH0cfwxgFUHpQh7FoCrjFJ6h6ZEpMF6xmujs4qMpP" +
+          "z8aaI4"
         )
       )
       // Convert to Java RSA key object// Convert to Java RSA key object
@@ -592,29 +515,25 @@ class RSAJWKSpec extends FreeSpec with RSAJWKJsonImplicits {
         result        <- RSAJWK.fromKeyPair(rsaPublicKey, rsaPrivateKey.get)
       } yield result
 
-      assert(
-        jwk2.map(_.modulus.asString) === Right(
-          "n4EPtAOCc9AlkeQHPzHStgAbgs7bTZLwUBZdR8_KuKPEHLd4rHVTeT" +
-          "-O-XV2jRojdNhxJWTDvNd7nqQ0VEiZQHz_AJmSCpMaJMRBSFKrKb2wqV" +
-          "wGU_NsYOYL-QtiWN2lbzcEe6XC0dApr5ydQLrHqkHHig3RBordaZ6Aj-" +
-          "oBHqFEHYpPe7Tpe-OfVfHd1E6cS6M1FZcD1NNLYD5lFHpPI9bTwJlsde" +
-          "3uhGqC0ZCuEHg8lhzwOHrtIQbS0FVbb9k3-tVTU4fg_3L_vniUFAKwuC" +
-          "LqKnS2BYwdq_mzSnbLY7h_qixoR7jig3__kRhuaxwUkRz5iaiQkqgc5g" +
-          "HdrNP5zw"
-        )
+      jwk2.map(_.modulus.asString) shouldBe Right(
+        "n4EPtAOCc9AlkeQHPzHStgAbgs7bTZLwUBZdR8_KuKPEHLd4rHVTeT" +
+        "-O-XV2jRojdNhxJWTDvNd7nqQ0VEiZQHz_AJmSCpMaJMRBSFKrKb2wqV" +
+        "wGU_NsYOYL-QtiWN2lbzcEe6XC0dApr5ydQLrHqkHHig3RBordaZ6Aj-" +
+        "oBHqFEHYpPe7Tpe-OfVfHd1E6cS6M1FZcD1NNLYD5lFHpPI9bTwJlsde" +
+        "3uhGqC0ZCuEHg8lhzwOHrtIQbS0FVbb9k3-tVTU4fg_3L_vniUFAKwuC" +
+        "LqKnS2BYwdq_mzSnbLY7h_qixoR7jig3__kRhuaxwUkRz5iaiQkqgc5g" +
+        "HdrNP5zw"
       )
-      assert(jwk2.map(_.publicExponent.asString) === Right("AQAB"))
-      assert(
-        jwk2.map(_.privateExponent.map(_.asString)) === Right(
-          Some(
-            "bWUC9B-EFRIo8kpGfh0ZuyGPvMNKvYWNtB_ikiH9k20eT-O1q_I78e" +
-            "iZkpXxXQ0UTEs2LsNRS-8uJbvQ-A1irkwMSMkK1J3XTGgdrhCku9gRld" +
-            "Y7sNA_AKZGh-Q661_42rINLRCe8W-nZ34ui_qOfkLnK9QWDDqpaIsA-b" +
-            "MwWWSDFu2MUBYwkHTMEzLYGqOe04noqeq1hExBTHBOBdkMXiuFhUq1BU" +
-            "6l-DqEiWxqg82sXt2h-LMnT3046AOYJoRioz75tSUQfGCshWTBnP5uDj" +
-            "d18kKhyv07lhfSJdrPdM5Plyl21hsFf4L_mHCuoFau7gdsPfHPxxjVOc" +
-            "OpBrQzwQ"
-          )
+      jwk2.map(_.publicExponent.asString) shouldBe Right("AQAB")
+      jwk2.map(_.privateExponent.map(_.asString)) shouldBe Right(
+        Some(
+          "bWUC9B-EFRIo8kpGfh0ZuyGPvMNKvYWNtB_ikiH9k20eT-O1q_I78e" +
+          "iZkpXxXQ0UTEs2LsNRS-8uJbvQ-A1irkwMSMkK1J3XTGgdrhCku9gRld" +
+          "Y7sNA_AKZGh-Q661_42rINLRCe8W-nZ34ui_qOfkLnK9QWDDqpaIsA-b" +
+          "MwWWSDFu2MUBYwkHTMEzLYGqOe04noqeq1hExBTHBOBdkMXiuFhUq1BU" +
+          "6l-DqEiWxqg82sXt2h-LMnT3046AOYJoRioz75tSUQfGCshWTBnP5uDj" +
+          "d18kKhyv07lhfSJdrPdM5Plyl21hsFf4L_mHCuoFau7gdsPfHPxxjVOc" +
+          "OpBrQzwQ"
         )
       )
     }
@@ -662,84 +581,70 @@ class RSAJWKSpec extends FreeSpec with RSAJWKJsonImplicits {
       val jwk = parse(jsonText).flatMap { json =>
         json.as[RSAJWK]
       }
-      assert(jwk.map(_.keyType) === Right(KeyType.RSA))
-      assert(jwk.map(_.keyId) === Right(Some(KeyId("frodo.baggins@hobbiton.example"))))
-      assert(jwk.map(_.publicKeyUseType) === Right(Some(PublicKeyUseType.Encryption)))
+      jwk.map(_.keyType) shouldBe Right(KeyType.RSA)
+      jwk.map(_.keyId) shouldBe Right(Some(KeyId("frodo.baggins@hobbiton.example")))
+      jwk.map(_.publicKeyUseType) shouldBe Right(Some(PublicKeyUseType.Encryption))
 
-      assert(
-        jwk.map(_.modulus.asString) === Right(
-          "maxhbsmBtdQ3CNrKvprUE6n9lYcregDMLYNeTAWcLj8NnPU9XIYegT" +
-          "HVHQjxKDSHP2l-F5jS7sppG1wgdAqZyhnWvXhYNvcM7RfgKxqNx_xAHx" +
-          "6f3yy7s-M9PSNCwPC2lh6UAkR4I00EhV9lrypM9Pi4lBUop9t5fS9W5U" +
-          "NwaAllhrd-osQGPjIeI1deHTwx-ZTHu3C60Pu_LJIl6hKn9wbwaUmA4c" +
-          "R5Bd2pgbaY7ASgsjCUbtYJaNIHSoHXprUdJZKUMAzV0WOKPfA6OPI4oy" +
-          "pBadjvMZ4ZAj3BnXaSYsEZhaueTXvZB4eZOAjIyh2e_VOIKVMsnDrJYA" +
-          "VotGlvMQ"
-        )
+      jwk.map(_.modulus.asString) shouldBe Right(
+        "maxhbsmBtdQ3CNrKvprUE6n9lYcregDMLYNeTAWcLj8NnPU9XIYegT" +
+        "HVHQjxKDSHP2l-F5jS7sppG1wgdAqZyhnWvXhYNvcM7RfgKxqNx_xAHx" +
+        "6f3yy7s-M9PSNCwPC2lh6UAkR4I00EhV9lrypM9Pi4lBUop9t5fS9W5U" +
+        "NwaAllhrd-osQGPjIeI1deHTwx-ZTHu3C60Pu_LJIl6hKn9wbwaUmA4c" +
+        "R5Bd2pgbaY7ASgsjCUbtYJaNIHSoHXprUdJZKUMAzV0WOKPfA6OPI4oy" +
+        "pBadjvMZ4ZAj3BnXaSYsEZhaueTXvZB4eZOAjIyh2e_VOIKVMsnDrJYA" +
+        "VotGlvMQ"
       )
-      assert(jwk.map(_.publicExponent.asString) === Right("AQAB"))
-      assert(
-        jwk.map(_.privateExponent.map(_.asString)) === Right(
-          Some(
-            "Kn9tgoHfiTVi8uPu5b9TnwyHwG5dK6RE0uFdlpCGnJN7ZEi963R7wy" +
-            "bQ1PLAHmpIbNTztfrheoAniRV1NCIqXaW_qS461xiDTp4ntEPnqcKsyO" +
-            "5jMAji7-CL8vhpYYowNFvIesgMoVaPRYMYT9TW63hNM0aWs7USZ_hLg6" +
-            "Oe1mY0vHTI3FucjSM86Nff4oIENt43r2fspgEPGRrdE6fpLc9Oaq-qeP" +
-            "1GFULimrRdndm-P8q8kvN3KHlNAtEgrQAgTTgz80S-3VD0FgWfgnb1PN" +
-            "miuPUxO8OpI9KDIfu_acc6fg14nsNaJqXe6RESvhGPH2afjHqSy_Fd2v" +
-            "pzj85bQQ"
-          )
+      jwk.map(_.publicExponent.asString) shouldBe Right("AQAB")
+      jwk.map(_.privateExponent.map(_.asString)) shouldBe Right(
+        Some(
+          "Kn9tgoHfiTVi8uPu5b9TnwyHwG5dK6RE0uFdlpCGnJN7ZEi963R7wy" +
+          "bQ1PLAHmpIbNTztfrheoAniRV1NCIqXaW_qS461xiDTp4ntEPnqcKsyO" +
+          "5jMAji7-CL8vhpYYowNFvIesgMoVaPRYMYT9TW63hNM0aWs7USZ_hLg6" +
+          "Oe1mY0vHTI3FucjSM86Nff4oIENt43r2fspgEPGRrdE6fpLc9Oaq-qeP" +
+          "1GFULimrRdndm-P8q8kvN3KHlNAtEgrQAgTTgz80S-3VD0FgWfgnb1PN" +
+          "miuPUxO8OpI9KDIfu_acc6fg14nsNaJqXe6RESvhGPH2afjHqSy_Fd2v" +
+          "pzj85bQQ"
         )
       )
 
-      assert(
-        jwk.map(_.firstPrimeFactor.map(_.asString)) === Right(
-          Some(
-            "2DwQmZ43FoTnQ8IkUj3BmKRf5Eh2mizZA5xEJ2MinUE3sdTYKSLtaE" +
-            "oekX9vbBZuWxHdVhM6UnKCJ_2iNk8Z0ayLYHL0_G21aXf9-unynEpUsH" +
-            "7HHTklLpYAzOOx1ZgVljoxAdWNn3hiEFrjZLZGS7lOH-a3QQlDDQoJOJ" +
-            "2VFmU"
-          )
+      jwk.map(_.firstPrimeFactor.map(_.asString)) shouldBe Right(
+        Some(
+          "2DwQmZ43FoTnQ8IkUj3BmKRf5Eh2mizZA5xEJ2MinUE3sdTYKSLtaE" +
+          "oekX9vbBZuWxHdVhM6UnKCJ_2iNk8Z0ayLYHL0_G21aXf9-unynEpUsH" +
+          "7HHTklLpYAzOOx1ZgVljoxAdWNn3hiEFrjZLZGS7lOH-a3QQlDDQoJOJ" +
+          "2VFmU"
         )
       )
-      assert(
-        jwk.map(_.secondPrimeFactor.map(_.asString)) === Right(
-          Some(
-            "te8LY4-W7IyaqH1ExujjMqkTAlTeRbv0VLQnfLY2xINnrWdwiQ93_V" +
-            "F099aP1ESeLja2nw-6iKIe-qT7mtCPozKfVtUYfz5HrJ_XY2kfexJINb" +
-            "9lhZHMv5p1skZpeIS-GPHCC6gRlKo1q-idn_qxyusfWv7WAxlSVfQfk8" +
-            "d6Et0"
-          )
+      jwk.map(_.secondPrimeFactor.map(_.asString)) shouldBe Right(
+        Some(
+          "te8LY4-W7IyaqH1ExujjMqkTAlTeRbv0VLQnfLY2xINnrWdwiQ93_V" +
+          "F099aP1ESeLja2nw-6iKIe-qT7mtCPozKfVtUYfz5HrJ_XY2kfexJINb" +
+          "9lhZHMv5p1skZpeIS-GPHCC6gRlKo1q-idn_qxyusfWv7WAxlSVfQfk8" +
+          "d6Et0"
         )
       )
-      assert(
-        jwk.map(_.firstFactorCRTExponent.map(_.asString)) === Right(
-          Some(
-            "UfYKcL_or492vVc0PzwLSplbg4L3-Z5wL48mwiswbpzOyIgd2xHTH" +
-            "QmjJpFAIZ8q-zf9RmgJXkDrFs9rkdxPtAsL1WYdeCT5c125Fkdg317JV" +
-            "RDo1inX7x2Kdh8ERCreW8_4zXItuTl_KiXZNU5lvMQjWbIw2eTx1lpsf" +
-            "lo0rYU"
-          )
+      jwk.map(_.firstFactorCRTExponent.map(_.asString)) shouldBe Right(
+        Some(
+          "UfYKcL_or492vVc0PzwLSplbg4L3-Z5wL48mwiswbpzOyIgd2xHTH" +
+          "QmjJpFAIZ8q-zf9RmgJXkDrFs9rkdxPtAsL1WYdeCT5c125Fkdg317JV" +
+          "RDo1inX7x2Kdh8ERCreW8_4zXItuTl_KiXZNU5lvMQjWbIw2eTx1lpsf" +
+          "lo0rYU"
         )
       )
-      assert(
-        jwk.map(_.secondFactorCRTExponent.map(_.asString)) === Right(
-          Some(
-            "iEgcO-QfpepdH8FWd7mUFyrXdnOkXJBCogChY6YKuIHGc_p8Le9Mb" +
-            "pFKESzEaLlN1Ehf3B6oGBl5Iz_ayUlZj2IoQZ82znoUrpa9fVYNot87A" +
-            "CfzIG7q9Mv7RiPAderZi03tkVXAdaBau_9vs5rS-7HMtxkVrxSUvJY14" +
-            "TkXlHE"
-          )
+      jwk.map(_.secondFactorCRTExponent.map(_.asString)) shouldBe Right(
+        Some(
+          "iEgcO-QfpepdH8FWd7mUFyrXdnOkXJBCogChY6YKuIHGc_p8Le9Mb" +
+          "pFKESzEaLlN1Ehf3B6oGBl5Iz_ayUlZj2IoQZ82znoUrpa9fVYNot87A" +
+          "CfzIG7q9Mv7RiPAderZi03tkVXAdaBau_9vs5rS-7HMtxkVrxSUvJY14" +
+          "TkXlHE"
         )
       )
-      assert(
-        jwk.map(_.firstCRTCoefficient.map(_.asString)) === Right(
-          Some(
-            "kC-lzZOqoFaZCr5l0tOVtREKoVqaAYhQiqIRGL-MzS4sCmRkxm5vZ" +
-            "lXYx6RtE1n_AagjqajlkjieGlxTTThHD8Iga6foGBMaAr5uR1hGQpSc7" +
-            "Gl7CF1DZkBJMTQN6EshYzZfxW08mIO8M6Rzuh0beL6fG9mkDcIyPrBXx" +
-            "2bQ_mM"
-          )
+      jwk.map(_.firstCRTCoefficient.map(_.asString)) shouldBe Right(
+        Some(
+          "kC-lzZOqoFaZCr5l0tOVtREKoVqaAYhQiqIRGL-MzS4sCmRkxm5vZ" +
+          "lXYx6RtE1n_AagjqajlkjieGlxTTThHD8Iga6foGBMaAr5uR1hGQpSc7" +
+          "Gl7CF1DZkBJMTQN6EshYzZfxW08mIO8M6Rzuh0beL6fG9mkDcIyPrBXx" +
+          "2bQ_mM"
         )
       )
       // Convert to Java RSA key object
@@ -748,29 +653,25 @@ class RSAJWKSpec extends FreeSpec with RSAJWKJsonImplicits {
         rsaPrivateKey <- jwk.flatMap(_.toRSAPrivateKey)
         result        <- RSAJWK.fromKeyPair(rsaPublicKey, rsaPrivateKey.get)
       } yield result
-      assert(
-        jwk2.map(_.modulus.asString) === Right(
-          "maxhbsmBtdQ3CNrKvprUE6n9lYcregDMLYNeTAWcLj8NnPU9XIYegT" +
-          "HVHQjxKDSHP2l-F5jS7sppG1wgdAqZyhnWvXhYNvcM7RfgKxqNx_xAHx" +
-          "6f3yy7s-M9PSNCwPC2lh6UAkR4I00EhV9lrypM9Pi4lBUop9t5fS9W5U" +
-          "NwaAllhrd-osQGPjIeI1deHTwx-ZTHu3C60Pu_LJIl6hKn9wbwaUmA4c" +
-          "R5Bd2pgbaY7ASgsjCUbtYJaNIHSoHXprUdJZKUMAzV0WOKPfA6OPI4oy" +
-          "pBadjvMZ4ZAj3BnXaSYsEZhaueTXvZB4eZOAjIyh2e_VOIKVMsnDrJYA" +
-          "VotGlvMQ"
-        )
+      jwk2.map(_.modulus.asString) shouldBe Right(
+        "maxhbsmBtdQ3CNrKvprUE6n9lYcregDMLYNeTAWcLj8NnPU9XIYegT" +
+        "HVHQjxKDSHP2l-F5jS7sppG1wgdAqZyhnWvXhYNvcM7RfgKxqNx_xAHx" +
+        "6f3yy7s-M9PSNCwPC2lh6UAkR4I00EhV9lrypM9Pi4lBUop9t5fS9W5U" +
+        "NwaAllhrd-osQGPjIeI1deHTwx-ZTHu3C60Pu_LJIl6hKn9wbwaUmA4c" +
+        "R5Bd2pgbaY7ASgsjCUbtYJaNIHSoHXprUdJZKUMAzV0WOKPfA6OPI4oy" +
+        "pBadjvMZ4ZAj3BnXaSYsEZhaueTXvZB4eZOAjIyh2e_VOIKVMsnDrJYA" +
+        "VotGlvMQ"
       )
-      assert(jwk2.map(_.publicExponent.asString) === Right("AQAB"))
-      assert(
-        jwk2.map(_.privateExponent.map(_.asString)) === Right(
-          Some(
-            "Kn9tgoHfiTVi8uPu5b9TnwyHwG5dK6RE0uFdlpCGnJN7ZEi963R7wy" +
-            "bQ1PLAHmpIbNTztfrheoAniRV1NCIqXaW_qS461xiDTp4ntEPnqcKsyO" +
-            "5jMAji7-CL8vhpYYowNFvIesgMoVaPRYMYT9TW63hNM0aWs7USZ_hLg6" +
-            "Oe1mY0vHTI3FucjSM86Nff4oIENt43r2fspgEPGRrdE6fpLc9Oaq-qeP" +
-            "1GFULimrRdndm-P8q8kvN3KHlNAtEgrQAgTTgz80S-3VD0FgWfgnb1PN" +
-            "miuPUxO8OpI9KDIfu_acc6fg14nsNaJqXe6RESvhGPH2afjHqSy_Fd2v" +
-            "pzj85bQQ"
-          )
+      jwk2.map(_.publicExponent.asString) shouldBe Right("AQAB")
+      jwk2.map(_.privateExponent.map(_.asString)) shouldBe Right(
+        Some(
+          "Kn9tgoHfiTVi8uPu5b9TnwyHwG5dK6RE0uFdlpCGnJN7ZEi963R7wy" +
+          "bQ1PLAHmpIbNTztfrheoAniRV1NCIqXaW_qS461xiDTp4ntEPnqcKsyO" +
+          "5jMAji7-CL8vhpYYowNFvIesgMoVaPRYMYT9TW63hNM0aWs7USZ_hLg6" +
+          "Oe1mY0vHTI3FucjSM86Nff4oIENt43r2fspgEPGRrdE6fpLc9Oaq-qeP" +
+          "1GFULimrRdndm-P8q8kvN3KHlNAtEgrQAgTTgz80S-3VD0FgWfgnb1PN" +
+          "miuPUxO8OpI9KDIfu_acc6fg14nsNaJqXe6RESvhGPH2afjHqSy_Fd2v" +
+          "pzj85bQQ"
         )
       )
     }
@@ -786,7 +687,7 @@ class RSAJWKSpec extends FreeSpec with RSAJWKJsonImplicits {
       }
       val thumbprint = jwk.flatMap(_.computeThumbprint)
       println(thumbprint)
-      assert(thumbprint === jwk.flatMap(_.computeThumbprint("SHA-256")))
+      thumbprint shouldBe jwk.flatMap(_.computeThumbprint("SHA-256"))
     }
 
   }
