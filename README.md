@@ -19,7 +19,7 @@ libraryDependencies += "com.chatwork" %% "scala-jwk" % "1.0.2"
 ```scala
 resolvers += "Sonatype OSS Snapshot Repository" at "https://oss.sonatype.org/content/repositories/snapshots/"
 
-libraryDependencies += "com.chatwork" %% "scala-jwk" % "1.0.2-SNAPSHOT"
+libraryDependencies += "com.chatwork" %% "scala-jwk" % "1.0.3-SNAPSHOT"
 ```
 
 
