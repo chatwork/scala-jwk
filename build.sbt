@@ -4,7 +4,9 @@ organization := "com.chatwork"
 
 name := "scala-jwk"
 
-scalaVersion := "2.12.4"
+scalaVersion := "2.12.6"
+
+crossScalaVersions := Seq("2.11.11", "2.12.6")
 
 scalacOptions ++= Seq(
   "-feature",
@@ -12,26 +14,17 @@ scalacOptions ++= Seq(
   "-unchecked",
   "-encoding",
   "UTF-8",
-  "-Xfatal-warnings",
   "-language:_",
-  // Warn if an argument list is modified to match the receiver
-  "-Ywarn-adapted-args",
-  // Warn when dead code is identified.
-  "-Ywarn-dead-code",
-  // Warn about inaccessible types in method signatures.
-  "-Ywarn-inaccessible",
-  // Warn when a type argument is inferred to be `Any`.
-  "-Ywarn-infer-any",
-  // Warn when non-nullary `def f()' overrides nullary `def f'
-  "-Ywarn-nullary-override",
-  // Warn when nullary methods return Unit.
-  "-Ywarn-nullary-unit",
-  // Warn when numerics are widened.
-  "-Ywarn-numeric-widen",
-  // Warn when imports are unused.
-  "-Ywarn-unused-import",
-  "-language:_"
-)
+) ++ {
+  CrossVersion.partialVersion(scalaVersion.value) match {
+    case Some((2L, scalaMajor)) if scalaMajor == 12 =>
+      Seq.empty
+    case Some((2L, scalaMajor)) if scalaMajor <= 11 =>
+      Seq(
+        "-Yinline-warnings"
+      )
+  }
+}
 
 resolvers ++= Seq(
   "Sonatype OSS Snapshot Repository" at "https://oss.sonatype.org/content/repositories/snapshots/",
@@ -65,7 +58,7 @@ pomIncludeRepository := { _ =>
 }
 
 pomExtra := {
-  <url>https://github.com/j5ik2o/base64scala</url>
+  <url>https://github.com/chatwork/scala-jwk</url>
     <licenses>
       <license>
         <name>The MIT License</name>

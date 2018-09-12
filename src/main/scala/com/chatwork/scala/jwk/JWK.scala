@@ -102,6 +102,7 @@ trait JWKJsonImplicits extends RSAJWKJsonImplicits with ECJWKJsonImplicits {
   }
 
   implicit val JWKJsonDecoder: Decoder[JWK] = Decoder.instance { hcursor =>
+    import cats.syntax.either._
     hcursor.get[KeyType]("kty").flatMap {
       case KeyType.RSA =>
         RSAJWKJsonDecoder(hcursor)

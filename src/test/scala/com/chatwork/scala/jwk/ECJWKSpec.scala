@@ -62,7 +62,7 @@ class ECJWKSpec extends FreeSpec with Matchers with ECJWKJsonImplicits {
       jwk.keyType shouldBe KeyType.EC
       jwk.curve shouldBe Curve.P_256
       val result = jwk.computeThumbprint.right.get
-      result.asString shouldBe "vx1xMdY0oeYX-j9BXh4Hgl93bw2AZoNX__6-iv2VX1U"
+      result.asString shouldBe "W6b8Mt2xhDFiy8sJe-MoWXIIkbty0HDhRjfI3VYWH6s"
     }
     "testJose4jVectorP384" in {
       val json = "{\"kty\":\"EC\"," +
@@ -73,7 +73,7 @@ class ECJWKSpec extends FreeSpec with Matchers with ECJWKJsonImplicits {
       jwk.keyType shouldBe KeyType.EC
       jwk.curve shouldBe Curve.P_384
       val result = jwk.computeThumbprint.right.get
-      result.asString shouldBe "1y8B5e0fFM-UyoPTL2Sj3awKAAcndAcbH_P_n7c2SHI"
+      result.asString shouldBe "S-6tPnrLPensd2med1er_jX_j7mythdvKIj9O_sNqL0"
     }
     "testJose4jVectorP521" in {
       val json = "{\"kty\":\"EC\"," +
@@ -84,7 +84,7 @@ class ECJWKSpec extends FreeSpec with Matchers with ECJWKJsonImplicits {
       jwk.keyType shouldBe KeyType.EC
       jwk.curve shouldBe Curve.P_521
       val result = jwk.computeThumbprint.right.get
-      result.asString shouldBe "VvFtUoEqSGMOPPmTnrVMzLHh1PmunZqECb8QdG9jEao"
+      result.asString shouldBe "EroitZ-og3Ji6ENuMuey6vEz4hA2i56rOJHfrTeDHII"
     }
   }
 }

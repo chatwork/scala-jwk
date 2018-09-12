@@ -2,7 +2,7 @@ package com.chatwork.scala.jwk
 
 import io.circe.syntax._
 import io.circe.{parser, Decoder, Encoder, Json}
-import cats.implicits._
+import cats.syntax.either._
 import com.chatwork.scala.jwk.JWKError.{JOSEError, JWKSetCreationError}
 
 import scala.collection.immutable.SortedSet
@@ -67,6 +67,7 @@ object JWKSet extends JWKSetJsonImplicits {
 
 trait JWKSetJsonImplicits extends JWKJsonImplicits {
   import io.circe.syntax._
+  import cats.syntax.either._
 
   implicit val JWKSetJsonEncoder: Encoder[JWKSet] = Encoder.instance { v =>
     Json.obj(
