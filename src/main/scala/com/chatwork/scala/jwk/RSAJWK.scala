@@ -5,8 +5,7 @@ import java.security._
 import java.security.interfaces.{RSAPrivateCrtKey, RSAPrivateKey, RSAPublicKey}
 import java.security.spec._
 import java.time.ZonedDateTime
-
-import cats.implicits._
+import cats.syntax.either._
 import com.chatwork.scala.jwk.JWKError._
 import com.github.j5ik2o.base64scala.{Base64String, Base64StringFactory}
 import io.circe._

@@ -6,13 +6,16 @@ import java.security.spec.{ECPoint, ECPrivateKeySpec, ECPublicKeySpec, InvalidKe
 import java.security.{KeyFactory, NoSuchAlgorithmException, _}
 import java.time.ZonedDateTime
 
-import cats.implicits._
 import com.chatwork.scala.jwk.JWKError._
 import com.chatwork.scala.jwk.utils.ECChecks
 import com.github.j5ik2o.base64scala.{Base64EncodeError, Base64String, Base64StringFactory, BigIntUtils}
-import io.circe._
+import io.circe.DecodingFailure
 
 object ECJWK extends ECJWKJsonImplicits {
+
+  import io.circe.Json
+  import io.circe.parser
+  import cats.implicits._
 
   def parseFromJson(json: Json): Either[JWKCreationError, ECJWK] =
     json.as[ECJWK].leftMap(error => JWKCreationError(error.getMessage, None))
@@ -176,6 +179,8 @@ class ECJWK private[jwk] (val curve: Curve,
 
   ECJWK.ensurePublicCoordinatesOnCurve(curve, x, y)
 
+  import cats.implicits._
+
   def toECPublicKey(provider: Option[Provider] = None): Either[PublicKeyCreationError, ECPublicKey] = {
     curve.toECParameterSpec
       .map { spec =>
@@ -311,6 +316,7 @@ class ECJWK private[jwk] (val curve: Curve,
 }
 
 trait ECJWKJsonImplicits extends JsonImplicits {
+  import io.circe.{Decoder, Encoder, Json}
   import io.circe.syntax._
 
   implicit val CurveJsonEncoder: Encoder[Curve] = Encoder[String].contramap(_.name)
@@ -330,11 +336,13 @@ trait ECJWKJsonImplicits extends JsonImplicits {
       "x5c"     -> v.x509CertificateChain.asJson,
       "crv"     -> v.curve.asJson,
       "x"       -> v.x.asJson,
-      "y"       -> v.y.asJson
+      "y"       -> v.y.asJson,
+      "d"       -> v.d.asJson
     )
   }
 
   implicit val ECJWKJsonDecoder: Decoder[ECJWK] = Decoder.instance { hcursor =>
+    import cats.syntax.either._
     for {
       _ <- hcursor.get[KeyType]("kty").flatMap { v =>
         if (v == KeyType.EC) Right(v) else Left(DecodingFailure("Invalid key type", hcursor.history))
@@ -350,6 +358,7 @@ trait ECJWKJsonImplicits extends JsonImplicits {
       crv    <- hcursor.get[Curve]("crv")
       x      <- hcursor.get[Base64String]("x")
       y      <- hcursor.get[Base64String]("y")
+      d      <- hcursor.getOrElse[Option[Base64String]]("d")(None)
     } yield
       new ECJWK(
         crv,
@@ -362,7 +371,8 @@ trait ECJWKJsonImplicits extends JsonImplicits {
         x5u,
         k5t,
         k5t256,
-        k5c
+        k5c,
+        d = d
       )
   }
 

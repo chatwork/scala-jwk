@@ -17,6 +17,7 @@ case class JWKMatcher(keyTypes: Set[KeyType],
                       sizesBits: Set[Int],
                       curves: Set[Curve],
                       x5tS256s: Set[Base64String]) {
+  import cats.syntax.either._
   def matches(key: JWK): Either[JOSEError, Boolean] = {
     if (hasUse && key.publicKeyUseType.isEmpty)
       Right(false)
