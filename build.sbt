@@ -4,7 +4,7 @@ organization := "com.chatwork"
 
 name := "scala-jwk"
 
-scalaVersion := "2.12.4"
+scalaVersion := "2.12.6"
 
 crossScalaVersions := Seq("2.11.11", "2.12.6")
 
@@ -58,7 +58,7 @@ pomIncludeRepository := { _ =>
 }
 
 pomExtra := {
-  <url>https://github.com/j5ik2o/base64scala</url>
+  <url>https://github.com/chatwork/scala-jwk</url>
     <licenses>
       <license>
         <name>The MIT License</name>
