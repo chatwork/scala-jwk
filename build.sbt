@@ -14,7 +14,7 @@ scalacOptions ++= Seq(
   "-unchecked",
   "-encoding",
   "UTF-8",
-  "-language:_",
+  "-language:_"
 ) ++ {
   CrossVersion.partialVersion(scalaVersion.value) match {
     case Some((2L, scalaMajor)) if scalaMajor == 12 =>
@@ -32,9 +32,9 @@ resolvers ++= Seq(
 )
 
 libraryDependencies ++= Seq(
-  ScalaTest.v3_0_1      % Test,
+  ScalaTest.latest      % Test,
   ScalaCheck.scalaCheck % Test,
-  Cats.v1_1_0,
+  Cats.latest,
   Enumeratum.latest,
   Scala.java8Compat,
   J5ik2o.base64scala,
