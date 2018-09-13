@@ -9,7 +9,7 @@ import scala.collection.immutable.SortedSet
 
 case class JWKSet(breachEncapsulationOfValues: SortedSet[JWK]) {
 
-  def keyByKeyId(keyId: String): Option[JWK] = {
+  def keyByKeyId(keyId: KeyId): Option[JWK] = {
     breachEncapsulationOfValues.find(_.keyId.contains(keyId))
   }
 
