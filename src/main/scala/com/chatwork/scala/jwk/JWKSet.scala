@@ -75,6 +75,8 @@ trait JWKSetJsonImplicits extends JWKJsonImplicits {
     )
   }
 
-  implicit val JWKSetJsonDecoder: Decoder[JWKSet] = Decoder.instance(_.get[Set[JWK]]("keys").map(JWKSet.fromSet))
+  implicit val JWKSetJsonDecoder: Decoder[JWKSet] = Decoder.instance(_.get[Seq[JWK]]("keys").map { v =>
+    JWKSet.fromSeq(v)
+  })
 
 }

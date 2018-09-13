@@ -49,11 +49,9 @@ abstract class JWK(val keyType: KeyType,
   import scala.math.Ordered._
 
   override def compareTo(that: JWK): Int = {
-    expireAt
-      .map(_.toInstant.toEpochMilli)
-      .compare(
-        that.expireAt.map(_.toInstant.toEpochMilli)
-      )
+    (keyId.map(_.value), expireAt.map(_.toInstant.toEpochMilli)) compare (that.keyId.map(_.value), that.expireAt.map(
+      _.toInstant.toEpochMilli
+    ))
   }
 
   def canEqual(other: Any): Boolean = other.isInstanceOf[JWK]
