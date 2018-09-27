@@ -6,7 +6,7 @@ object Scala {
 }
 
 object Circe {
-  val version           = "0.10.0-M1"
+  val version           = "0.10.0"
   val core: ModuleID    = "io.circe" %% "circe-core" % version
   val parser: ModuleID  = "io.circe" %% "circe-parser" % version
   val generic: ModuleID = "io.circe" %% "circe-generic" % version
