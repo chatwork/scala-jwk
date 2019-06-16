@@ -6,7 +6,7 @@ object Scala {
 }
 
 object Circe {
-  val version           = "0.10.0"
+  val version           = "0.11.1"
   val core: ModuleID    = "io.circe" %% "circe-core" % version
   val parser: ModuleID  = "io.circe" %% "circe-parser" % version
   val generic: ModuleID = "io.circe" %% "circe-generic" % version
@@ -17,11 +17,11 @@ object ScalaTest {
 }
 
 object Cats {
-  val v1_1_0="org.typelevel"         %% "cats-core"            % "1.1.0"
+  val v1_6_1 ="org.typelevel"         %% "cats-core"            % "1.6.1"
 }
 
 object Enumeratum {
-  val latest = "com.beachape" %% "enumeratum" % "1.5.12"
+  val latest = "com.beachape" %% "enumeratum" % "1.5.13"
 }
 
 object ScalaCheck {
@@ -29,5 +29,5 @@ object ScalaCheck {
 }
 
 object J5ik2o {
-  val base64scala = "com.github.j5ik2o" %% "base64scala" % "1.0.4"
+  val base64scala = "com.github.j5ik2o" %% "base64scala" % "1.0.4" excludeAll ExclusionRule(organization = "io.circe")
 }

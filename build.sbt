@@ -4,9 +4,9 @@ organization := "com.chatwork"
 
 name := "scala-jwk"
 
-scalaVersion := "2.12.6"
+scalaVersion := "2.12.8"
 
-crossScalaVersions := Seq("2.11.11", "2.12.6")
+crossScalaVersions := Seq("2.11.11", "2.12.8")
 
 scalacOptions ++= Seq(
   "-feature",
@@ -34,7 +34,7 @@ resolvers ++= Seq(
 libraryDependencies ++= Seq(
   ScalaTest.v3_0_1      % Test,
   ScalaCheck.scalaCheck % Test,
-  Cats.v1_1_0,
+  Cats.v1_6_1,
   Enumeratum.latest,
   Scala.java8Compat,
   J5ik2o.base64scala,
