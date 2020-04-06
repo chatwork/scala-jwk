@@ -4,7 +4,7 @@ This Scala library supports JWKSet(RFC7517).
 
 ## Installation
 
-Add the following to your sbt build (2.11.x, 2.12.x):
+Add the following to your sbt build (2.12.x, 2.13.x):
 
 ### Release Version
 
