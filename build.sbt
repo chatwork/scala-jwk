@@ -4,9 +4,9 @@ organization := "com.chatwork"
 
 name := "scala-jwk"
 
-scalaVersion := "2.12.6"
+scalaVersion := "2.12.10"
 
-crossScalaVersions := Seq("2.11.11", "2.12.6")
+crossScalaVersions := Seq("2.11.12", "2.12.10")
 
 scalacOptions ++= Seq(
   "-feature",
