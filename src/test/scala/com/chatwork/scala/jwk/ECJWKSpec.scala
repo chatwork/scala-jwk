@@ -2,9 +2,11 @@ package com.chatwork.scala.jwk
 
 import com.chatwork.scala.jwk.JWKError.JWKCreationError
 import com.github.j5ik2o.base64scala.Base64String
-import org.scalatest.{FreeSpec, Matchers}
+import org.scalatest.EitherValues
+import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.should.Matchers
 
-class ECJWKSpec extends FreeSpec with Matchers with ECJWKJsonImplicits {
+class ECJWKSpec extends AnyFreeSpec with Matchers with ECJWKJsonImplicits with EitherValues {
   object P_256 {
     val crv = Curve.P_256
     val x   = Base64String("MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4", urlSafe = true)
@@ -23,17 +25,21 @@ class ECJWKSpec extends FreeSpec with Matchers with ECJWKJsonImplicits {
   }
   object P_521_Alt {
     val crv = Curve.P_521
-    val x = Base64String("AfwEaSkqoPQynn4SdAXOqbyDuK6KsbI04i-6aWvh3GdvREZuHaWFyg791gcvJ4OqG13-gzfYxZxfblPMqfOtQrzk",
-                         urlSafe = true)
-    val y = Base64String("AHgOZhhJb2ZiozkquiEa0Z9SfERJbWaaE7qEnCuk9VVZaWruKWKNzZadoIRPt8h305r14KRoxu8AfV20X-d_2Ups",
-                         urlSafe = true)
+    val x = Base64String(
+      "AfwEaSkqoPQynn4SdAXOqbyDuK6KsbI04i-6aWvh3GdvREZuHaWFyg791gcvJ4OqG13-gzfYxZxfblPMqfOtQrzk",
+      urlSafe = true
+    )
+    val y = Base64String(
+      "AHgOZhhJb2ZiozkquiEa0Z9SfERJbWaaE7qEnCuk9VVZaWruKWKNzZadoIRPt8h305r14KRoxu8AfV20X-d_2Ups",
+      urlSafe = true
+    )
   }
   "ECJWK" - {
     "key size" in {
-      ECJWK(P_256.crv, P_256.x, P_256.y, d = Some(P_256.d)).right.get.size.right.get shouldBe 256
-      ECJWK(P_256_Alt.crv, P_256_Alt.x, P_256_Alt.y).right.get.size.right.get shouldBe 256
-      ECJWK(P_384_Alt.crv, P_384_Alt.x, P_384_Alt.y).right.get.size.right.get shouldBe 384
-      ECJWK(P_521_Alt.crv, P_521_Alt.x, P_521_Alt.y).right.get.size.right.get shouldBe 521
+      ECJWK(P_256.crv, P_256.x, P_256.y, d = Some(P_256.d)).right.value.size.right.value shouldBe 256
+      ECJWK(P_256_Alt.crv, P_256_Alt.x, P_256_Alt.y).right.value.size.right.value shouldBe 256
+      ECJWK(P_384_Alt.crv, P_384_Alt.x, P_384_Alt.y).right.value.size.right.value shouldBe 384
+      ECJWK(P_521_Alt.crv, P_521_Alt.x, P_521_Alt.y).right.value.size.right.value shouldBe 521
     }
     "supported Curves Constant" in {
       ECJWK.SUPPORTED_CURVES.contains(Curve.P_256) shouldBe true
@@ -55,35 +61,35 @@ class ECJWKSpec extends FreeSpec with Matchers with ECJWKJsonImplicits {
     }
     "testJose4jVectorP256" in {
       val json = "{\"kty\":\"EC\"," +
-      "\"x\":\"CEuRLUISufhcjrj-32N0Bvl3KPMiHH9iSw4ohN9jxrA\"," +
-      "\"y\":\"EldWz_iXSK3l_S7n4w_t3baxos7o9yqX0IjzG959vHc\"," +
-      "\"crv\":\"P-256\"}"
-      val jwk = ECJWK.parseFromText(json).right.get
+        "\"x\":\"CEuRLUISufhcjrj-32N0Bvl3KPMiHH9iSw4ohN9jxrA\"," +
+        "\"y\":\"EldWz_iXSK3l_S7n4w_t3baxos7o9yqX0IjzG959vHc\"," +
+        "\"crv\":\"P-256\"}"
+      val jwk = ECJWK.parseFromText(json).right.value
       jwk.keyType shouldBe KeyType.EC
       jwk.curve shouldBe Curve.P_256
-      val result = jwk.computeThumbprint.right.get
+      val result = jwk.computeThumbprint.right.value
       result.asString shouldBe "W6b8Mt2xhDFiy8sJe-MoWXIIkbty0HDhRjfI3VYWH6s"
     }
     "testJose4jVectorP384" in {
       val json = "{\"kty\":\"EC\"," +
-      " \"x\":\"2jCG5DmKUql9YPn7F2C-0ljWEbj8O8-vn5Ih1k7Wzb-y3NpBLiG1BiRa392b1kcQ\"," +
-      " \"y\":\"7Ragi9rT-5tSzaMbJlH_EIJl6rNFfj4V4RyFM5U2z4j1hesX5JXa8dWOsE-5wPIl\"," +
-      " \"crv\":\"P-384\"}"
-      val jwk = ECJWK.parseFromText(json).right.get
+        " \"x\":\"2jCG5DmKUql9YPn7F2C-0ljWEbj8O8-vn5Ih1k7Wzb-y3NpBLiG1BiRa392b1kcQ\"," +
+        " \"y\":\"7Ragi9rT-5tSzaMbJlH_EIJl6rNFfj4V4RyFM5U2z4j1hesX5JXa8dWOsE-5wPIl\"," +
+        " \"crv\":\"P-384\"}"
+      val jwk = ECJWK.parseFromText(json).right.value
       jwk.keyType shouldBe KeyType.EC
       jwk.curve shouldBe Curve.P_384
-      val result = jwk.computeThumbprint.right.get
+      val result = jwk.computeThumbprint.right.value
       result.asString shouldBe "S-6tPnrLPensd2med1er_jX_j7mythdvKIj9O_sNqL0"
     }
     "testJose4jVectorP521" in {
       val json = "{\"kty\":\"EC\"," +
-      "\"x\":\"Aeq3uMrb3iCQEt0PzSeZMmrmYhsKP5DM1oMP6LQzTFQY9-F3Ab45xiK4AJxltXEI-87g3gRwId88hTyHgq180JDt\"," +
-      "\"y\":\"ARA0lIlrZMEzaXyXE4hjEkc50y_JON3qL7HSae9VuWpOv_2kit8p3pyJBiRb468_U5ztLT7FvDvtimyS42trhDTu\"," +
-      "\"crv\":\"P-521\"}"
-      val jwk = ECJWK.parseFromText(json).right.get
+        "\"x\":\"Aeq3uMrb3iCQEt0PzSeZMmrmYhsKP5DM1oMP6LQzTFQY9-F3Ab45xiK4AJxltXEI-87g3gRwId88hTyHgq180JDt\"," +
+        "\"y\":\"ARA0lIlrZMEzaXyXE4hjEkc50y_JON3qL7HSae9VuWpOv_2kit8p3pyJBiRb468_U5ztLT7FvDvtimyS42trhDTu\"," +
+        "\"crv\":\"P-521\"}"
+      val jwk = ECJWK.parseFromText(json).right.value
       jwk.keyType shouldBe KeyType.EC
       jwk.curve shouldBe Curve.P_521
-      val result = jwk.computeThumbprint.right.get
+      val result = jwk.computeThumbprint.right.value
       result.asString shouldBe "EroitZ-og3Ji6ENuMuey6vEz4hA2i56rOJHfrTeDHII"
     }
   }

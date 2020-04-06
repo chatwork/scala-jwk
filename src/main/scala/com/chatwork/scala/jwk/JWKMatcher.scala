@@ -3,21 +3,22 @@ package com.chatwork.scala.jwk
 import com.chatwork.scala.jwk.JWKError.JOSEError
 import com.github.j5ik2o.base64scala.Base64String
 
-case class JWKMatcher(keyTypes: Set[KeyType],
-                      uses: Set[PublicKeyUseType],
-                      operation: Set[KeyOperationType],
-                      algs: Set[AlgorithmType],
-                      ids: Set[String],
-                      hasUse: Boolean,
-                      hasId: Boolean,
-                      privateOnly: Boolean,
-                      publicOnley: Boolean,
-                      minSizeBits: Int,
-                      maxSizeBits: Int,
-                      sizesBits: Set[Int],
-                      curves: Set[Curve],
-                      x5tS256s: Set[Base64String]) {
-  import cats.syntax.either._
+case class JWKMatcher(
+    keyTypes: Set[KeyType],
+    uses: Set[PublicKeyUseType],
+    operation: Set[KeyOperationType],
+    algs: Set[AlgorithmType],
+    ids: Set[String],
+    hasUse: Boolean,
+    hasId: Boolean,
+    privateOnly: Boolean,
+    publicOnley: Boolean,
+    minSizeBits: Int,
+    maxSizeBits: Int,
+    sizesBits: Set[Int],
+    curves: Set[Curve],
+    x5tS256s: Set[Base64String]
+) {
   def matches(key: JWK): Either[JOSEError, Boolean] = {
     if (hasUse && key.publicKeyUseType.isEmpty)
       Right(false)

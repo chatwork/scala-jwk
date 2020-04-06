@@ -1,24 +1,23 @@
 package com.chatwork.scala.jwk
 
 import java.net.URI
-import java.security.interfaces.{ECPrivateKey, ECPublicKey}
-import java.security.spec.{ECPoint, ECPrivateKeySpec, ECPublicKeySpec, InvalidKeySpecException}
-import java.security.{KeyFactory, NoSuchAlgorithmException, _}
+import java.security.interfaces.{ ECPrivateKey, ECPublicKey }
+import java.security.spec.{ ECPoint, ECPrivateKeySpec, ECPublicKeySpec, InvalidKeySpecException }
+import java.security.{ KeyFactory, NoSuchAlgorithmException, _ }
 import java.time.ZonedDateTime
 
 import com.chatwork.scala.jwk.JWKError._
 import com.chatwork.scala.jwk.utils.ECChecks
-import com.github.j5ik2o.base64scala.{Base64EncodeError, Base64String, Base64StringFactory, BigIntUtils}
+import com.github.j5ik2o.base64scala.{ Base64EncodeError, Base64String, Base64StringFactory, BigIntUtils }
 import io.circe.DecodingFailure
 
 object ECJWK extends ECJWKJsonImplicits {
 
   import io.circe.Json
   import io.circe.parser
-  import cats.implicits._
 
   def parseFromJson(json: Json): Either[JWKCreationError, ECJWK] =
-    json.as[ECJWK].leftMap(error => JWKCreationError(error.getMessage, None))
+    json.as[ECJWK].left.map(error => JWKCreationError(error.getMessage, None))
 
   def parseFromText(jsonText: String): Either[JWKCreationError, ECJWK] = {
     parser
@@ -30,21 +29,23 @@ object ECJWK extends ECJWKJsonImplicits {
     }
   }
 
-  def apply(curve: Curve,
-            x: Base64String,
-            y: Base64String,
-            publicKeyUseType: Option[PublicKeyUseType] = None,
-            keyOperations: KeyOperations = KeyOperations.empty,
-            algorithmType: Option[JWSAlgorithmType] = None,
-            keyId: Option[KeyId] = None,
-            x509Url: Option[URI] = None,
-            x509CertificateSHA1Thumbprint: Option[Base64String] = None,
-            x509CertificateSHA256Thumbprint: Option[Base64String] = None,
-            x509CertificateChain: List[Base64String] = List.empty,
-            d: Option[Base64String] = None,
-            privateKey: Option[PrivateKey] = None,
-            expireAt: Option[ZonedDateTime] = None,
-            keyStore: Option[KeyStore] = None): Either[JWKCreationError, ECJWK] = {
+  def apply(
+      curve: Curve,
+      x: Base64String,
+      y: Base64String,
+      publicKeyUseType: Option[PublicKeyUseType] = None,
+      keyOperations: KeyOperations = KeyOperations.empty,
+      algorithmType: Option[JWSAlgorithmType] = None,
+      keyId: Option[KeyId] = None,
+      x509Url: Option[URI] = None,
+      x509CertificateSHA1Thumbprint: Option[Base64String] = None,
+      x509CertificateSHA256Thumbprint: Option[Base64String] = None,
+      x509CertificateChain: List[Base64String] = List.empty,
+      d: Option[Base64String] = None,
+      privateKey: Option[PrivateKey] = None,
+      expireAt: Option[ZonedDateTime] = None,
+      keyStore: Option[KeyStore] = None
+  ): Either[JWKCreationError, ECJWK] = {
     try {
       Right(
         new ECJWK(
@@ -70,23 +71,27 @@ object ECJWK extends ECJWKJsonImplicits {
     }
   }
 
-  def fromKeyPair(curve: Curve,
-                  pub: ECPublicKey,
-                  priv: ECPrivateKey,
-                  publicKeyUseType: Option[PublicKeyUseType] = None,
-                  keyOperations: KeyOperations = KeyOperations.empty,
-                  algorithmType: Option[JWSAlgorithmType] = None,
-                  keyId: Option[KeyId] = None,
-                  x509Url: Option[URI] = None,
-                  x509CertificateSHA1Thumbprint: Option[Base64String] = None,
-                  x509CertificateSHA256Thumbprint: Option[Base64String] = None,
-                  x509CertificateChain: List[Base64String] = List.empty,
-                  expireAt: Option[ZonedDateTime] = None): Either[JWKCreationError, ECJWK] = {
+  def fromKeyPair(
+      curve: Curve,
+      pub: ECPublicKey,
+      priv: ECPrivateKey,
+      publicKeyUseType: Option[PublicKeyUseType] = None,
+      keyOperations: KeyOperations = KeyOperations.empty,
+      algorithmType: Option[JWSAlgorithmType] = None,
+      keyId: Option[KeyId] = None,
+      x509Url: Option[URI] = None,
+      x509CertificateSHA1Thumbprint: Option[Base64String] = None,
+      x509CertificateSHA256Thumbprint: Option[Base64String] = None,
+      x509CertificateChain: List[Base64String] = List.empty,
+      expireAt: Option[ZonedDateTime] = None
+  ): Either[JWKCreationError, ECJWK] = {
     for {
-      pub <- encodeCoordinate(pub.getParams.getCurve.getField.getFieldSize, pub.getW.getAffineX())
-        .leftMap(error => JWKCreationError(error.message))
-      priv <- encodeCoordinate(priv.getParams.getCurve.getField.getFieldSize, priv.getS())
-        .leftMap(error => JWKCreationError(error.message))
+      pub <- encodeCoordinate(pub.getParams.getCurve.getField.getFieldSize, pub.getW.getAffineX()).left.map(error =>
+        JWKCreationError(error.message)
+      )
+      priv <- encodeCoordinate(priv.getParams.getCurve.getField.getFieldSize, priv.getS()).left.map(error =>
+        JWKCreationError(error.message)
+      )
       jwk <- apply(
         curve,
         pub,
@@ -111,12 +116,11 @@ object ECJWK extends ECJWKJsonImplicits {
     val result = for {
       dx <- x.decodeToBigInt
       dy <- y.decodeToBigInt
-    } yield
-      ECChecks.isPointOnCurve(
-        dx,
-        dy,
-        curve.toECParameterSpec.getOrElse(throw new IllegalArgumentException("Unknown curve instance."))
-      )
+    } yield ECChecks.isPointOnCurve(
+      dx,
+      dy,
+      curve.toECParameterSpec.getOrElse(throw new IllegalArgumentException("Unknown curve instance."))
+    )
 
     if (result.isLeft)
       throw new IllegalArgumentException(
@@ -140,22 +144,23 @@ object ECJWK extends ECJWKJsonImplicits {
 
 }
 
-class ECJWK private[jwk] (val curve: Curve,
-                          val x: Base64String,
-                          val y: Base64String,
-                          publicKeyUseType: Option[PublicKeyUseType] = None,
-                          keyOperations: KeyOperations = KeyOperations.empty,
-                          algorithmType: Option[JWSAlgorithmType] = None,
-                          keyId: Option[KeyId] = None,
-                          x509Url: Option[URI] = None,
-                          x509CertificateSHA1Thumbprint: Option[Base64String] = None,
-                          x509CertificateSHA256Thumbprint: Option[Base64String] = None,
-                          x509CertificateChain: List[Base64String] = List.empty,
-                          val d: Option[Base64String] = None,
-                          val privateKey: Option[PrivateKey] = None,
-                          expireAt: Option[ZonedDateTime] = None,
-                          keyStore: Option[KeyStore] = None)
-    extends JWK(
+class ECJWK private[jwk] (
+    val curve: Curve,
+    val x: Base64String,
+    val y: Base64String,
+    publicKeyUseType: Option[PublicKeyUseType] = None,
+    keyOperations: KeyOperations = KeyOperations.empty,
+    algorithmType: Option[JWSAlgorithmType] = None,
+    keyId: Option[KeyId] = None,
+    x509Url: Option[URI] = None,
+    x509CertificateSHA1Thumbprint: Option[Base64String] = None,
+    x509CertificateSHA256Thumbprint: Option[Base64String] = None,
+    x509CertificateChain: List[Base64String] = List.empty,
+    val d: Option[Base64String] = None,
+    val privateKey: Option[PrivateKey] = None,
+    expireAt: Option[ZonedDateTime] = None,
+    keyStore: Option[KeyStore] = None
+) extends JWK(
       KeyType.EC,
       publicKeyUseType,
       keyOperations,
@@ -179,14 +184,12 @@ class ECJWK private[jwk] (val curve: Curve,
 
   ECJWK.ensurePublicCoordinatesOnCurve(curve, x, y)
 
-  import cats.implicits._
-
   def toECPublicKey(provider: Option[Provider] = None): Either[PublicKeyCreationError, ECPublicKey] = {
     curve.toECParameterSpec
       .map { spec =>
         for {
-          dx <- x.decodeToBigInt.leftMap(error => PublicKeyCreationError(error.message))
-          dy <- y.decodeToBigInt.leftMap(error => PublicKeyCreationError(error.message))
+          dx <- x.decodeToBigInt.left.map(error => PublicKeyCreationError(error.message))
+          dy <- y.decodeToBigInt.left.map(error => PublicKeyCreationError(error.message))
           publicKeySpec = new ECPublicKeySpec(new ECPoint(dx.bigInteger, dy.bigInteger), spec)
           result <- try {
             val keyFactory = provider.map(p => KeyFactory.getInstance("EC", p)).getOrElse(KeyFactory.getInstance("EC"))
@@ -208,7 +211,7 @@ class ECJWK private[jwk] (val curve: Curve,
         curve.toECParameterSpec
           .map { spec =>
             for {
-              dx <- _d.decodeToBigInt.leftMap(error => PrivateKeyCreationError(error.message))
+              dx <- _d.decodeToBigInt.left.map(error => PrivateKeyCreationError(error.message))
               privateKeySpec = new ECPrivateKeySpec(dx.bigInteger, spec)
               result <- try {
                 val keyFactory =
@@ -249,9 +252,7 @@ class ECJWK private[jwk] (val curve: Curve,
 
   override def size: Either[JWKError.JOSEError, Int] = {
     curve.toECParameterSpec
-      .map { spec =>
-        Right(spec.getCurve.getField.getFieldSize)
-      }
+      .map { spec => Right(spec.getCurve.getField.getFieldSize) }
       .getOrElse(Left(JOSEError("Couldn't determine field size for curve " + curve.name)))
   }
 
@@ -316,7 +317,7 @@ class ECJWK private[jwk] (val curve: Curve,
 }
 
 trait ECJWKJsonImplicits extends JsonImplicits {
-  import io.circe.{Decoder, Encoder, Json}
+  import io.circe.{ Decoder, Encoder, Json }
   import io.circe.syntax._
 
   implicit val CurveJsonEncoder: Encoder[Curve] = Encoder[String].contramap(_.name)
@@ -342,7 +343,6 @@ trait ECJWKJsonImplicits extends JsonImplicits {
   }
 
   implicit val ECJWKJsonDecoder: Decoder[ECJWK] = Decoder.instance { hcursor =>
-    import cats.syntax.either._
     for {
       _ <- hcursor.get[KeyType]("kty").flatMap { v =>
         if (v == KeyType.EC) Right(v) else Left(DecodingFailure("Invalid key type", hcursor.history))
@@ -359,21 +359,20 @@ trait ECJWKJsonImplicits extends JsonImplicits {
       x      <- hcursor.get[Base64String]("x")
       y      <- hcursor.get[Base64String]("y")
       d      <- hcursor.getOrElse[Option[Base64String]]("d")(None)
-    } yield
-      new ECJWK(
-        crv,
-        x,
-        y,
-        use,
-        ops,
-        alg,
-        kid,
-        x5u,
-        k5t,
-        k5t256,
-        k5c,
-        d = d
-      )
+    } yield new ECJWK(
+      crv,
+      x,
+      y,
+      use,
+      ops,
+      alg,
+      kid,
+      x5u,
+      k5t,
+      k5t256,
+      k5c,
+      d = d
+    )
   }
 
 }

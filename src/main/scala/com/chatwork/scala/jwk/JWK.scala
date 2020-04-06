@@ -4,31 +4,30 @@ import java.net.URI
 import java.security.KeyStore
 import java.time.ZonedDateTime
 
-import com.chatwork.scala.jwk.JWKError.{JOSEError, JWKThumbprintError}
+import com.chatwork.scala.jwk.JWKError.{ JOSEError, JWKThumbprintError }
 import com.github.j5ik2o.base64scala.Base64String
-import io.circe.{Decoder, Encoder}
+import io.circe.{ Decoder, Encoder }
 
-abstract class JWK(val keyType: KeyType,
-                   val publicKeyUseType: Option[PublicKeyUseType],
-                   val keyOperations: KeyOperations,
-                   val algorithmType: Option[JWSAlgorithmType],
-                   val keyId: Option[KeyId],
-                   val x509Url: Option[URI],
-                   val x509CertificateSHA256Thumbprint: Option[Base64String],
-                   val x509CertificateSHA1Thumbprint: Option[Base64String],
-                   val x509CertificateChain: List[Base64String],
-                   val expireAt: Option[ZonedDateTime],
-                   val keyStore: Option[KeyStore])
-    extends Ordered[JWK] {
+abstract class JWK(
+    val keyType: KeyType,
+    val publicKeyUseType: Option[PublicKeyUseType],
+    val keyOperations: KeyOperations,
+    val algorithmType: Option[JWSAlgorithmType],
+    val keyId: Option[KeyId],
+    val x509Url: Option[URI],
+    val x509CertificateSHA256Thumbprint: Option[Base64String],
+    val x509CertificateSHA1Thumbprint: Option[Base64String],
+    val x509CertificateChain: List[Base64String],
+    val expireAt: Option[ZonedDateTime],
+    val keyStore: Option[KeyStore]
+) extends Ordered[JWK] {
 
   require(x509CertificateSHA256Thumbprint.fold(true)(_.urlSafe))
   require(x509CertificateSHA1Thumbprint.fold(true)(_.urlSafe))
   require(if (x509CertificateChain.isEmpty) true else x509CertificateChain.forall(_.urlSafe))
 
   require(
-    publicKeyUseType.fold(true) { pku =>
-      KeyUseAndOpsConsistency.areConsistent(pku, keyOperations)
-    },
+    publicKeyUseType.fold(true) { pku => KeyUseAndOpsConsistency.areConsistent(pku, keyOperations) },
     "The key use \"use\" and key options \"key_opts\" parameters are not consistent, " +
     "see RFC 7517, section 4.3"
   )
@@ -72,15 +71,17 @@ abstract class JWK(val keyType: KeyType,
   }
 
   override def hashCode(): Int = {
-    val state = Seq(keyType,
-                    publicKeyUseType,
-                    keyOperations,
-                    algorithmType,
-                    keyId,
-                    x509Url,
-                    x509CertificateSHA256Thumbprint,
-                    x509CertificateSHA1Thumbprint,
-                    x509CertificateChain)
+    val state = Seq(
+      keyType,
+      publicKeyUseType,
+      keyOperations,
+      algorithmType,
+      keyId,
+      x509Url,
+      x509CertificateSHA256Thumbprint,
+      x509CertificateSHA1Thumbprint,
+      x509CertificateChain
+    )
     state.map(_.hashCode()).foldLeft(0)((a, b) => 31 * a + b)
   }
 
@@ -100,7 +101,6 @@ trait JWKJsonImplicits extends RSAJWKJsonImplicits with ECJWKJsonImplicits {
   }
 
   implicit val JWKJsonDecoder: Decoder[JWK] = Decoder.instance { hcursor =>
-    import cats.syntax.either._
     hcursor.get[KeyType]("kty").flatMap {
       case KeyType.RSA =>
         RSAJWKJsonDecoder(hcursor)

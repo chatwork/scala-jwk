@@ -1,9 +1,8 @@
 package com.chatwork.scala.jwk
 
 import io.circe.syntax._
-import io.circe.{parser, Decoder, Encoder, Json}
-import cats.syntax.either._
-import com.chatwork.scala.jwk.JWKError.{JOSEError, JWKSetCreationError}
+import io.circe.{ parser, Decoder, Encoder, Json }
+import com.chatwork.scala.jwk.JWKError.{ JOSEError, JWKSetCreationError }
 
 import scala.collection.immutable.SortedSet
 
@@ -31,11 +30,11 @@ case class JWKSet(breachEncapsulationOfValues: SortedSet[JWK]) {
   lazy val toPublicJWKSet: JWKSet = JWKSet(breachEncapsulationOfValues.map(_.toPublicJWK))
 
   def toJsonString(implicit encoder: Encoder[JWKSet]): String = {
-    JWKPrinter.noSpaces.pretty(this.asJson)
+    JWKPrinter.noSpaces.print(this.asJson)
   }
 
   def toJsonStringWithSpace(implicit encoder: Encoder[JWKSet]): String = {
-    JWKPrinter.space2.pretty(this.asJson)
+    JWKPrinter.space2.print(this.asJson)
   }
 
 }
@@ -60,7 +59,7 @@ object JWKSet extends JWKSetJsonImplicits {
   }
 
   def parseFromJson(json: Json): Either[JWKSetCreationError, JWKSet] = {
-    json.as[JWKSet].leftMap(error => JWKSetCreationError(error.getMessage(), None))
+    json.as[JWKSet].left.map(error => JWKSetCreationError(error.getMessage(), None))
   }
 
 }

@@ -1,7 +1,7 @@
 package com.chatwork.scala.jwk.utils
 
-import java.security.interfaces.{ECPrivateKey, ECPublicKey}
-import java.security.spec.{ECFieldFp, ECParameterSpec}
+import java.security.interfaces.{ ECPrivateKey, ECPublicKey }
+import java.security.spec.{ ECFieldFp, ECParameterSpec }
 
 object ECChecks {
 

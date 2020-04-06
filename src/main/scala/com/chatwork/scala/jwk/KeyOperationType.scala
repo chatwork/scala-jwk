@@ -1,7 +1,7 @@
 package com.chatwork.scala.jwk
 
 import enumeratum._
-import io.circe.{Decoder, Encoder}
+import io.circe.{ Decoder, Encoder }
 
 import scala.collection.immutable
 

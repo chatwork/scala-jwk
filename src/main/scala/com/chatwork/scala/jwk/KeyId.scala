@@ -3,10 +3,10 @@ package com.chatwork.scala.jwk
 import java.security.interfaces.RSAPublicKey
 
 import io.circe.syntax._
-import io.circe.{Decoder, Encoder, Json}
+import io.circe.{ Decoder, Encoder, Json }
 import cats.implicits._
 import com.chatwork.scala.jwk.JWKError.JWKThumbprintError
-import com.github.j5ik2o.base64scala.{Base64String, Base64StringFactory}
+import com.github.j5ik2o.base64scala.{ Base64String, Base64StringFactory }
 
 case class KeyId(value: String)
 
