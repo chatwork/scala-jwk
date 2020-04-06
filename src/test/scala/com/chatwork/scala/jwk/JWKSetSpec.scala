@@ -3,7 +3,7 @@ package com.chatwork.scala.jwk
 import com.github.j5ik2o.base64scala.Base64String
 import cats.syntax.either._
 import io.circe.parser._
-import org.scalatest.{FreeSpec, Matchers}
+import org.scalatest.{ FreeSpec, Matchers }
 
 class JWKSetSpec extends FreeSpec with Matchers with JWKSetJsonImplicits {
 
@@ -57,9 +57,7 @@ class JWKSetSpec extends FreeSpec with Matchers with JWKSetJsonImplicits {
            |  "keys": [${jsonText("1")}, ${jsonText("2")}]
            |}
          """.stripMargin
-      val jwkSet = parse(jwkSetJsonText).flatMap { json =>
-        json.as[JWKSet]
-      }
+      val jwkSet = parse(jwkSetJsonText).flatMap { json => json.as[JWKSet] }
       jwkSet.right.get.size shouldBe 2
       def rsaJwk(kid: String) = new RSAJWK(
         n = Base64String(

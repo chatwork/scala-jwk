@@ -5,7 +5,6 @@ import io.circe.Printer
 object JWKPrinter {
 
   val noSpaces: Printer = Printer(
-    preserveOrder = true,
     dropNullValues = true,
     indent = ""
   )

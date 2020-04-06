@@ -2,19 +2,18 @@ package com.chatwork.scala.jwk
 
 import java.net.URI
 import java.security._
-import java.security.interfaces.{RSAPrivateCrtKey, RSAPrivateKey, RSAPublicKey}
+import java.security.interfaces.{ RSAPrivateCrtKey, RSAPrivateKey, RSAPublicKey }
 import java.security.spec._
 import java.time.ZonedDateTime
-import cats.syntax.either._
 import com.chatwork.scala.jwk.JWKError._
-import com.github.j5ik2o.base64scala.{Base64String, Base64StringFactory}
+import com.github.j5ik2o.base64scala.{ Base64String, Base64StringFactory }
 import io.circe._
 import io.circe.syntax._
 
 object RSAJWK extends RSAJWKJsonImplicits {
 
   def parseFromJson(json: Json): Either[JWKCreationError, RSAJWK] =
-    json.as[RSAJWK].leftMap(error => JWKCreationError(error.getMessage, None))
+    json.as[RSAJWK].left.map(error => JWKCreationError(error.getMessage, None))
 
   def parseFromText(jsonText: String): Either[JWKCreationError, RSAJWK] = {
     parser
@@ -28,25 +27,27 @@ object RSAJWK extends RSAJWKJsonImplicits {
 
   private val base64StringFactory = Base64StringFactory(urlSafe = true, isNoPadding = true)
 
-  def apply(n: Base64String,
-            e: Base64String,
-            publicKeyUse: Option[PublicKeyUseType] = None,
-            keyOperations: KeyOperations = KeyOperations.empty,
-            algorithmType: Option[JWSAlgorithmType] = None,
-            keyId: Option[KeyId] = None,
-            x509Url: Option[URI] = None,
-            x509CertificateSHA1Thumbprint: Option[Base64String] = None,
-            x509CertificateSHA256Thumbprint: Option[Base64String] = None,
-            x509CertificateChain: List[Base64String] = List.empty,
-            d: Option[Base64String] = None,
-            p: Option[Base64String] = None,
-            q: Option[Base64String] = None,
-            dp: Option[Base64String] = None,
-            dq: Option[Base64String] = None,
-            qi: Option[Base64String] = None,
-            oth: Seq[OtherPrimesInfo] = Seq.empty,
-            privateKey: Option[PrivateKey] = None,
-            expireAt: Option[ZonedDateTime] = None): Either[JWKCreationError, RSAJWK] = {
+  def apply(
+      n: Base64String,
+      e: Base64String,
+      publicKeyUse: Option[PublicKeyUseType] = None,
+      keyOperations: KeyOperations = KeyOperations.empty,
+      algorithmType: Option[JWSAlgorithmType] = None,
+      keyId: Option[KeyId] = None,
+      x509Url: Option[URI] = None,
+      x509CertificateSHA1Thumbprint: Option[Base64String] = None,
+      x509CertificateSHA256Thumbprint: Option[Base64String] = None,
+      x509CertificateChain: List[Base64String] = List.empty,
+      d: Option[Base64String] = None,
+      p: Option[Base64String] = None,
+      q: Option[Base64String] = None,
+      dp: Option[Base64String] = None,
+      dq: Option[Base64String] = None,
+      qi: Option[Base64String] = None,
+      oth: Seq[OtherPrimesInfo] = Seq.empty,
+      privateKey: Option[PrivateKey] = None,
+      expireAt: Option[ZonedDateTime] = None
+  ): Either[JWKCreationError, RSAJWK] = {
     try {
       Right(
         new RSAJWK(
@@ -77,23 +78,27 @@ object RSAJWK extends RSAJWKJsonImplicits {
     }
   }
 
-  def fromRSAPublicKey(rsaPublicKey: RSAPublicKey,
-                       publicKeyUseType: Option[PublicKeyUseType] = None,
-                       keyOperations: KeyOperations = KeyOperations.empty,
-                       algorithmType: Option[JWSAlgorithmType] = None,
-                       keyId: Option[KeyId] = None,
-                       x509Url: Option[URI] = None,
-                       x509CertificateSHA1Thumbprint: Option[Base64String] = None,
-                       x509CertificateSHA256Thumbprint: Option[Base64String] = None,
-                       x509CertificateChain: List[Base64String] = List.empty,
-                       expireAt: Option[ZonedDateTime] = None): Either[JWKCreationError, RSAJWK] = {
+  def fromRSAPublicKey(
+      rsaPublicKey: RSAPublicKey,
+      publicKeyUseType: Option[PublicKeyUseType] = None,
+      keyOperations: KeyOperations = KeyOperations.empty,
+      algorithmType: Option[JWSAlgorithmType] = None,
+      keyId: Option[KeyId] = None,
+      x509Url: Option[URI] = None,
+      x509CertificateSHA1Thumbprint: Option[Base64String] = None,
+      x509CertificateSHA256Thumbprint: Option[Base64String] = None,
+      x509CertificateChain: List[Base64String] = List.empty,
+      expireAt: Option[ZonedDateTime] = None
+  ): Either[JWKCreationError, RSAJWK] = {
     for {
       n <- base64StringFactory
         .encode(rsaPublicKey.getModulus)
-        .leftMap(error => JWKCreationError(error.message))
+        .left
+        .map(error => JWKCreationError(error.message))
       e <- base64StringFactory
         .encode(rsaPublicKey.getPublicExponent)
-        .leftMap(error => JWKCreationError(error.message))
+        .left
+        .map(error => JWKCreationError(error.message))
       result <- apply(
         n,
         e,
@@ -110,17 +115,19 @@ object RSAJWK extends RSAJWKJsonImplicits {
     } yield result
   }
 
-  def fromKeyPair(rsaPublicKey: RSAPublicKey,
-                  rsaPrivateKey: RSAPrivateKey,
-                  publicKeyUseType: Option[PublicKeyUseType] = None,
-                  keyOperations: KeyOperations = KeyOperations.empty,
-                  keyId: Option[KeyId] = None,
-                  algorithmType: Option[JWSAlgorithmType] = None,
-                  x509Url: Option[URI] = None,
-                  x509CertificateSHA1Thumbprint: Option[Base64String] = None,
-                  x509CertificateSHA256Thumbprint: Option[Base64String] = None,
-                  x509CertificateChain: List[Base64String] = List.empty,
-                  expireAt: Option[ZonedDateTime] = None): Either[JWKCreationError, RSAJWK] = {
+  def fromKeyPair(
+      rsaPublicKey: RSAPublicKey,
+      rsaPrivateKey: RSAPrivateKey,
+      publicKeyUseType: Option[PublicKeyUseType] = None,
+      keyOperations: KeyOperations = KeyOperations.empty,
+      keyId: Option[KeyId] = None,
+      algorithmType: Option[JWSAlgorithmType] = None,
+      x509Url: Option[URI] = None,
+      x509CertificateSHA1Thumbprint: Option[Base64String] = None,
+      x509CertificateSHA256Thumbprint: Option[Base64String] = None,
+      x509CertificateChain: List[Base64String] = List.empty,
+      expireAt: Option[ZonedDateTime] = None
+  ): Either[JWKCreationError, RSAJWK] = {
     rsaPrivateKey match {
       case pv: RSAPrivateCrtKey =>
         fromPublicKeyWithPrivateCrtKey(
@@ -169,13 +176,16 @@ object RSAJWK extends RSAJWKJsonImplicits {
     for {
       n <- base64StringFactory
         .encode(rsaPublicKey.getModulus)
-        .leftMap(error => JWKCreationError(error.message, None))
+        .left
+        .map(error => JWKCreationError(error.message, None))
       e <- base64StringFactory
         .encode(rsaPublicKey.getPublicExponent)
-        .leftMap(error => JWKCreationError(error.message, None))
+        .left
+        .map(error => JWKCreationError(error.message, None))
       d <- base64StringFactory
         .encode(rsaPrivateKey.getPrivateExponent)
-        .leftMap(error => JWKCreationError(error.message, None))
+        .left
+        .map(error => JWKCreationError(error.message, None))
       result <- apply(
         n,
         e,
@@ -209,28 +219,36 @@ object RSAJWK extends RSAJWKJsonImplicits {
     for {
       n <- base64StringFactory
         .encode(rsaPublicKey.getModulus)
-        .leftMap(error => JWKCreationError(error.message))
+        .left
+        .map(error => JWKCreationError(error.message))
       e <- base64StringFactory
         .encode(rsaPublicKey.getPublicExponent)
-        .leftMap(error => JWKCreationError(error.message))
+        .left
+        .map(error => JWKCreationError(error.message))
       d <- base64StringFactory
         .encode(rsaPrivateKey.getPrivateExponent)
-        .leftMap(error => JWKCreationError(error.message))
+        .left
+        .map(error => JWKCreationError(error.message))
       p <- base64StringFactory
         .encode(rsaPrivateKey.getPrimeP)
-        .leftMap(error => JWKCreationError(error.message))
+        .left
+        .map(error => JWKCreationError(error.message))
       q <- base64StringFactory
         .encode(rsaPrivateKey.getPrimeQ)
-        .leftMap(error => JWKCreationError(error.message))
+        .left
+        .map(error => JWKCreationError(error.message))
       dp <- base64StringFactory
         .encode(rsaPrivateKey.getPrimeExponentP)
-        .leftMap(error => JWKCreationError(error.message))
+        .left
+        .map(error => JWKCreationError(error.message))
       dq <- base64StringFactory
         .encode(rsaPrivateKey.getPrimeExponentQ)
-        .leftMap(error => JWKCreationError(error.message))
+        .left
+        .map(error => JWKCreationError(error.message))
       qi <- base64StringFactory
         .encode(rsaPrivateKey.getCrtCoefficient)
-        .leftMap(error => JWKCreationError(error.message))
+        .left
+        .map(error => JWKCreationError(error.message))
       result <- apply(
         n,
         e,
@@ -345,11 +363,11 @@ class RSAJWK private[jwk] (
     privateExponent
       .map { _d =>
         val privateKeySpecEither = for {
-          _modulus <- modulus.decodeToBigInt.leftMap(
-            err => PrivateKeyCreationError(s"KeySpec creation failed.(${err.message})")
+          _modulus <- modulus.decodeToBigInt.left.map(err =>
+            PrivateKeyCreationError(s"KeySpec creation failed.(${err.message})")
           )
-          _privateExponent <- _d.decodeToBigInt.leftMap(
-            err => PrivateKeyCreationError(s"KeySpec creation failed.(${err.message})")
+          _privateExponent <- _d.decodeToBigInt.left.map(err =>
+            PrivateKeyCreationError(s"KeySpec creation failed.(${err.message})")
           )
           privateKeySpec <- createRSAPrivateKeySpec(_modulus, _privateExponent)
         } yield privateKeySpec
@@ -372,32 +390,34 @@ class RSAJWK private[jwk] (
   ): Either[PrivateKeyCreationError, RSAPrivateKeySpec] = {
     p.map { _p =>
         for {
-          _publicExponent <- e.decodeToBigInt.leftMap(e => PrivateKeyCreationError(e.message))
-          _primeP         <- _p.decodeToBigInt.leftMap(e => PrivateKeyCreationError(e.message))
+          _publicExponent <- e.decodeToBigInt.left.map(e => PrivateKeyCreationError(e.message))
+          _primeP         <- _p.decodeToBigInt.left.map(e => PrivateKeyCreationError(e.message))
           _primeQ <- q
-            .map(_.decodeToBigInt.leftMap(e => PrivateKeyCreationError(e.message)))
+            .map(_.decodeToBigInt.left.map(e => PrivateKeyCreationError(e.message)))
             .getOrElse(Left(PrivateKeyCreationError("primeQ is not found.")))
           _primeExponentP <- dp
-            .map(_.decodeToBigInt.leftMap(e => PrivateKeyCreationError(e.message)))
+            .map(_.decodeToBigInt.left.map(e => PrivateKeyCreationError(e.message)))
             .getOrElse(Left(PrivateKeyCreationError("primeExponentP is not found.")))
           _primeExponentQ <- dq
-            .map(_.decodeToBigInt.leftMap(e => PrivateKeyCreationError(e.message)))
+            .map(_.decodeToBigInt.left.map(e => PrivateKeyCreationError(e.message)))
             .getOrElse(Left(PrivateKeyCreationError("primeExponentQ is not found.")))
           _crtCoefficient <- qi
-            .map(_.decodeToBigInt.leftMap(e => PrivateKeyCreationError(e.message)))
+            .map(_.decodeToBigInt.left.map(e => PrivateKeyCreationError(e.message)))
             .getOrElse(Left(PrivateKeyCreationError("crtCoefficient is not found.")))
-          spec <- createInternalPrivateKeySpec(_modulus,
-                                               _publicExponent,
-                                               _privateExponent,
-                                               _primeP,
-                                               _primeQ,
-                                               _primeExponentP,
-                                               _primeExponentQ,
-                                               _crtCoefficient)
+          spec <- createInternalPrivateKeySpec(
+            _modulus,
+            _publicExponent,
+            _privateExponent,
+            _primeP,
+            _primeQ,
+            _primeExponentP,
+            _primeExponentQ,
+            _crtCoefficient
+          )
         } yield spec
       }
       .getOrElse {
-        Either.right[PrivateKeyCreationError, RSAPrivateKeySpec](
+        Right[PrivateKeyCreationError, RSAPrivateKeySpec](
           new RSAPrivateKeySpec(_modulus.bigInteger, _privateExponent.bigInteger)
         )
       }
@@ -414,17 +434,22 @@ class RSAJWK private[jwk] (
       _crtCoefficient: BigInt
   ): Either[PrivateKeyCreationError, RSAPrivateKeySpec] = {
     otherPrimes
-      .foldLeft(Either.right[PrivateKeyCreationError, Seq[RSAOtherPrimeInfo]](Seq.empty)) { (r, otherPrimesInfo) =>
+      .foldLeft[Either[PrivateKeyCreationError, Seq[RSAOtherPrimeInfo]]](
+        Right(Seq.empty)
+      ) { (r, otherPrimesInfo) =>
         val e = for {
           otherPrime <- otherPrimesInfo.primeFactor.decodeToBigInt
             .map(_.bigInteger)
-            .leftMap(e => PrivateKeyCreationError(e.message))
+            .left
+            .map(e => PrivateKeyCreationError(e.message))
           otherPrimeExponent <- otherPrimesInfo.factorCRTExponent.decodeToBigInt
             .map(_.bigInteger)
-            .leftMap(e => PrivateKeyCreationError(e.message))
+            .left
+            .map(e => PrivateKeyCreationError(e.message))
           otherCrtCoefficient <- otherPrimesInfo.factorCRTCoefficient.decodeToBigInt
             .map(_.bigInteger)
-            .leftMap(e => PrivateKeyCreationError(e.message))
+            .left
+            .map(e => PrivateKeyCreationError(e.message))
         } yield new RSAOtherPrimeInfo(otherPrime, otherPrimeExponent, otherCrtCoefficient)
         for { result <- r; _e <- e } yield result :+ _e
       }
@@ -460,7 +485,7 @@ class RSAJWK private[jwk] (
       modulus  <- n.decodeToBigInt
       exponent <- e.decodeToBigInt
       spec     <- Right(new RSAPublicKeySpec(modulus.bigInteger, exponent.bigInteger))
-    } yield spec).leftMap(e => PublicKeyCreationError(s"KeySpec creation failed.(${e.message})"))
+    } yield spec).left.map(e => PublicKeyCreationError(s"KeySpec creation failed.(${e.message})"))
     specEither.flatMap { spec =>
       try {
         val factory = KeyFactory.getInstance("RSA")
@@ -490,7 +515,7 @@ class RSAJWK private[jwk] (
 
   override def size: Either[JOSEError, Int] =
     for {
-      _n <- n.decode.leftMap(err => JOSEError(err.message))
+      _n <- n.decode.left.map(err => JOSEError(err.message))
       r  <- ByteUtils.safeBitLength(_n)
     } yield r
 
@@ -550,15 +575,17 @@ class RSAJWK private[jwk] (
 
   override def toString =
     (Seq(modulus, publicExponent) ++
-    Seq(keyType,
-        publicKeyUseType,
-        keyOperations,
-        algorithmType,
-        keyId,
-        x509Url,
-        x509CertificateSHA256Thumbprint,
-        x509CertificateSHA1Thumbprint,
-        x509CertificateChain) ++
+    Seq(
+      keyType,
+      publicKeyUseType,
+      keyOperations,
+      algorithmType,
+      keyId,
+      x509Url,
+      x509CertificateSHA256Thumbprint,
+      x509CertificateSHA1Thumbprint,
+      x509CertificateChain
+    ) ++
     Seq(
       privateExponent,
       firstPrimeFactor,
@@ -570,7 +597,7 @@ class RSAJWK private[jwk] (
     )).mkString("RSAJWK(", ",", ")")
 
   def toJsonString(implicit encoder: Encoder[RSAJWK]): String = {
-    JWKPrinter.noSpaces.pretty(this.asJson)
+    JWKPrinter.noSpaces.print(this.asJson)
   }
 
   override def compare(that: JWK): Int = super.compareTo(that)
@@ -623,25 +650,24 @@ trait RSAJWKJsonImplicits extends JsonImplicits {
       dp     <- hcursor.getOrElse[Option[Base64String]]("dp")(None)
       dq     <- hcursor.getOrElse[Option[Base64String]]("dq")(None)
       qi     <- hcursor.getOrElse[Option[Base64String]]("qi")(None)
-    } yield
-      new RSAJWK(
-        n,
-        e,
-        use,
-        ops,
-        alg,
-        kid,
-        x5u,
-        k5t,
-        k5t256,
-        k5c,
-        d,
-        p,
-        q,
-        dp,
-        dq,
-        qi
-      )
+    } yield new RSAJWK(
+      n,
+      e,
+      use,
+      ops,
+      alg,
+      kid,
+      x5u,
+      k5t,
+      k5t256,
+      k5c,
+      d,
+      p,
+      q,
+      dp,
+      dq,
+      qi
+    )
   }
 
 }

@@ -1,13 +1,13 @@
 package com.chatwork.scala.jwk
 
 import java.nio.charset.Charset
-import java.security.{MessageDigest, NoSuchAlgorithmException}
+import java.security.{ MessageDigest, NoSuchAlgorithmException }
 
 import io.circe.Json
 import io.circe.syntax._
 import cats.implicits._
-import com.chatwork.scala.jwk.JWKError.{Cause, JWKThumbprintError}
-import com.github.j5ik2o.base64scala.{Base64String, Base64StringFactory}
+import com.chatwork.scala.jwk.JWKError.{ Cause, JWKThumbprintError }
+import com.github.j5ik2o.base64scala.{ Base64String, Base64StringFactory }
 
 object JWKThumbprint extends JWKJsonImplicits {
 
@@ -22,8 +22,10 @@ object JWKThumbprint extends JWKJsonImplicits {
     } catch {
       case ex: NoSuchAlgorithmException =>
         Left(
-          JWKThumbprintError("Couldn't compute JWK thumbprint: Unsupported hash algorithm: " + ex.getMessage,
-                             Some(Cause(ex)))
+          JWKThumbprintError(
+            "Couldn't compute JWK thumbprint: Unsupported hash algorithm: " + ex.getMessage,
+            Some(Cause(ex))
+          )
         )
     }
   }

@@ -1,7 +1,7 @@
 package com.chatwork.scala.jwk
 
 import com.github.j5ik2o.base64scala.Base64String
-import io.circe.{Decoder, Encoder}
+import io.circe.{ Decoder, Encoder }
 
 trait Base64StringJsonImplicits {
 

@@ -1,7 +1,7 @@
 package com.chatwork.scala.jwk
 
 import java.math.BigInteger
-import java.security.spec.{ECFieldFp, ECParameterSpec, ECPoint, EllipticCurve}
+import java.security.spec.{ ECFieldFp, ECParameterSpec, ECPoint, EllipticCurve }
 
 object ECParameterTable {
 

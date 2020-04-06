@@ -16,9 +16,7 @@ object KeyUseAndOpsConsistency {
   )
 
   def areConsistent(use: PublicKeyUseType, ops: KeyOperations): Boolean = {
-    ops.breachEncapsulationOfValues.forall { v =>
-      rules(use).contains(v)
-    }
+    ops.breachEncapsulationOfValues.forall { v => rules(use).contains(v) }
   }
 
 }
