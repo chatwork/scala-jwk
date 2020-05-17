@@ -17,7 +17,7 @@ object scalatest {
 }
 
 object beachape {
-  val enumeratum = "com.beachape" %% "enumeratum" % "1.5.15"
+  val enumeratum = "com.beachape" %% "enumeratum" % "1.6.1"
 }
 
 object scalacheck {
