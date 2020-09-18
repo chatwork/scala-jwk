@@ -13,7 +13,7 @@ object circe {
 }
 
 object scalatest {
-  val scalatest = "org.scalatest" %% "scalatest" % "3.2.1"
+  val scalatest = "org.scalatest" %% "scalatest" % "3.2.2"
 }
 
 object beachape {
