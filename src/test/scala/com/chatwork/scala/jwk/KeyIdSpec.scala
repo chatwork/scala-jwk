@@ -6,10 +6,11 @@ import java.security.spec.RSAPublicKeySpec
 import java.util.UUID
 
 import com.github.j5ik2o.base64scala.Base64String
-import org.scalatest.{ FreeSpec, Matchers }
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.freespec.AnyFreeSpec
 import cats.syntax.either._
 
-class KeyIdSpec extends FreeSpec with Matchers {
+class KeyIdSpec extends AnyFreeSpec with Matchers {
 
   private val n = "0vx7agoebGcQSuuPiLJXZptN9nndrQmbXEps2aiAFbWhM78LhWx" +
     "4cbbfAAtVT86zwu1RK7aPFFxuhDR1L6tSoc_BJECPebWKRXjBZCiFV4n3oknjhMs" +

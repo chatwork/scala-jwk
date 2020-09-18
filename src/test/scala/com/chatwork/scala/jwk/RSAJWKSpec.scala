@@ -8,10 +8,11 @@ import java.security.{ KeyFactory, KeyPairGenerator }
 import com.github.j5ik2o.base64scala.{ Base64String, Base64StringFactory }
 import io.circe.parser._
 import io.circe.syntax._
-import org.scalatest.{ FreeSpec, Matchers }
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.freespec.AnyFreeSpec
 import cats.syntax.either._
 
-class RSAJWKSpec extends FreeSpec with Matchers with RSAJWKJsonImplicits {
+class RSAJWKSpec extends AnyFreeSpec with Matchers with RSAJWKJsonImplicits {
   val base64StringFactory = Base64StringFactory(urlSafe = true, isNoPadding = true)
   private val n = "0vx7agoebGcQSuuPiLJXZptN9nndrQmbXEps2aiAFbWhM78LhWx" +
     "4cbbfAAtVT86zwu1RK7aPFFxuhDR1L6tSoc_BJECPebWKRXjBZCiFV4n3oknjhMs" +
