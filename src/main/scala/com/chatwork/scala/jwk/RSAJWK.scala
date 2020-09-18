@@ -389,38 +389,37 @@ class RSAJWK private[jwk] (
       _privateExponent: BigInt
   ): Either[PrivateKeyCreationError, RSAPrivateKeySpec] = {
     p.map { _p =>
-        for {
-          _publicExponent <- e.decodeToBigInt.left.map(e => PrivateKeyCreationError(e.message))
-          _primeP         <- _p.decodeToBigInt.left.map(e => PrivateKeyCreationError(e.message))
-          _primeQ <- q
-            .map(_.decodeToBigInt.left.map(e => PrivateKeyCreationError(e.message)))
-            .getOrElse(Left(PrivateKeyCreationError("primeQ is not found.")))
-          _primeExponentP <- dp
-            .map(_.decodeToBigInt.left.map(e => PrivateKeyCreationError(e.message)))
-            .getOrElse(Left(PrivateKeyCreationError("primeExponentP is not found.")))
-          _primeExponentQ <- dq
-            .map(_.decodeToBigInt.left.map(e => PrivateKeyCreationError(e.message)))
-            .getOrElse(Left(PrivateKeyCreationError("primeExponentQ is not found.")))
-          _crtCoefficient <- qi
-            .map(_.decodeToBigInt.left.map(e => PrivateKeyCreationError(e.message)))
-            .getOrElse(Left(PrivateKeyCreationError("crtCoefficient is not found.")))
-          spec <- createInternalPrivateKeySpec(
-            _modulus,
-            _publicExponent,
-            _privateExponent,
-            _primeP,
-            _primeQ,
-            _primeExponentP,
-            _primeExponentQ,
-            _crtCoefficient
-          )
-        } yield spec
-      }
-      .getOrElse {
-        Right[PrivateKeyCreationError, RSAPrivateKeySpec](
-          new RSAPrivateKeySpec(_modulus.bigInteger, _privateExponent.bigInteger)
+      for {
+        _publicExponent <- e.decodeToBigInt.left.map(e => PrivateKeyCreationError(e.message))
+        _primeP         <- _p.decodeToBigInt.left.map(e => PrivateKeyCreationError(e.message))
+        _primeQ <- q
+          .map(_.decodeToBigInt.left.map(e => PrivateKeyCreationError(e.message)))
+          .getOrElse(Left(PrivateKeyCreationError("primeQ is not found.")))
+        _primeExponentP <- dp
+          .map(_.decodeToBigInt.left.map(e => PrivateKeyCreationError(e.message)))
+          .getOrElse(Left(PrivateKeyCreationError("primeExponentP is not found.")))
+        _primeExponentQ <- dq
+          .map(_.decodeToBigInt.left.map(e => PrivateKeyCreationError(e.message)))
+          .getOrElse(Left(PrivateKeyCreationError("primeExponentQ is not found.")))
+        _crtCoefficient <- qi
+          .map(_.decodeToBigInt.left.map(e => PrivateKeyCreationError(e.message)))
+          .getOrElse(Left(PrivateKeyCreationError("crtCoefficient is not found.")))
+        spec <- createInternalPrivateKeySpec(
+          _modulus,
+          _publicExponent,
+          _privateExponent,
+          _primeP,
+          _primeQ,
+          _primeExponentP,
+          _primeExponentQ,
+          _crtCoefficient
         )
-      }
+      } yield spec
+    }.getOrElse {
+      Right[PrivateKeyCreationError, RSAPrivateKeySpec](
+        new RSAPrivateKeySpec(_modulus.bigInteger, _privateExponent.bigInteger)
+      )
+    }
   }
 
   private def createInternalPrivateKeySpec(
@@ -544,16 +543,16 @@ class RSAJWK private[jwk] (
   override def equals(other: Any): Boolean = other match {
     case that: RSAJWK =>
       super.equals(that) &&
-      (that canEqual this) &&
-      modulus == that.modulus &&
-      publicExponent == that.publicExponent &&
-      privateExponent == that.privateExponent &&
-      firstPrimeFactor == that.firstPrimeFactor &&
-      secondPrimeFactor == that.secondPrimeFactor &&
-      firstFactorCRTExponent == that.firstFactorCRTExponent &&
-      secondFactorCRTExponent == that.secondFactorCRTExponent &&
-      firstCRTCoefficient == that.firstCRTCoefficient &&
-      otherPrimes == that.otherPrimes
+        (that canEqual this) &&
+        modulus == that.modulus &&
+        publicExponent == that.publicExponent &&
+        privateExponent == that.privateExponent &&
+        firstPrimeFactor == that.firstPrimeFactor &&
+        secondPrimeFactor == that.secondPrimeFactor &&
+        firstFactorCRTExponent == that.firstFactorCRTExponent &&
+        secondFactorCRTExponent == that.secondFactorCRTExponent &&
+        firstCRTCoefficient == that.firstCRTCoefficient &&
+        otherPrimes == that.otherPrimes
     case _ => false
   }
 
@@ -575,26 +574,26 @@ class RSAJWK private[jwk] (
 
   override def toString =
     (Seq(modulus, publicExponent) ++
-    Seq(
-      keyType,
-      publicKeyUseType,
-      keyOperations,
-      algorithmType,
-      keyId,
-      x509Url,
-      x509CertificateSHA256Thumbprint,
-      x509CertificateSHA1Thumbprint,
-      x509CertificateChain
-    ) ++
-    Seq(
-      privateExponent,
-      firstPrimeFactor,
-      secondPrimeFactor,
-      firstFactorCRTExponent,
-      secondFactorCRTExponent,
-      firstCRTCoefficient,
-      otherPrimes
-    )).mkString("RSAJWK(", ",", ")")
+      Seq(
+        keyType,
+        publicKeyUseType,
+        keyOperations,
+        algorithmType,
+        keyId,
+        x509Url,
+        x509CertificateSHA256Thumbprint,
+        x509CertificateSHA1Thumbprint,
+        x509CertificateChain
+      ) ++
+      Seq(
+        privateExponent,
+        firstPrimeFactor,
+        secondPrimeFactor,
+        firstFactorCRTExponent,
+        secondFactorCRTExponent,
+        firstCRTCoefficient,
+        otherPrimes
+      )).mkString("RSAJWK(", ",", ")")
 
   def toJsonString(implicit encoder: Encoder[RSAJWK]): String = {
     JWKPrinter.noSpaces.print(this.asJson)
