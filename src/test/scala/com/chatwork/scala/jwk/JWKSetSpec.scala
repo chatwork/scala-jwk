@@ -3,9 +3,10 @@ package com.chatwork.scala.jwk
 import com.github.j5ik2o.base64scala.Base64String
 import cats.syntax.either._
 import io.circe.parser._
-import org.scalatest.{ FreeSpec, Matchers }
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.freespec.AnyFreeSpec
 
-class JWKSetSpec extends FreeSpec with Matchers with JWKSetJsonImplicits {
+class JWKSetSpec extends AnyFreeSpec with Matchers with JWKSetJsonImplicits {
 
   "JWKSet" - {
     "should be able to parse JWKSet" in {
