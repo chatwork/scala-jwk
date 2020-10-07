@@ -58,15 +58,15 @@ abstract class JWK(
   override def equals(other: Any): Boolean = other match {
     case that: JWK =>
       (that canEqual this) &&
-      keyType == that.keyType &&
-      publicKeyUseType == that.publicKeyUseType &&
-      keyOperations == that.keyOperations &&
-      algorithmType == that.algorithmType &&
-      keyId == that.keyId &&
-      x509Url == that.x509Url &&
-      x509CertificateSHA256Thumbprint == that.x509CertificateSHA256Thumbprint &&
-      x509CertificateSHA1Thumbprint == that.x509CertificateSHA1Thumbprint &&
-      x509CertificateChain == that.x509CertificateChain
+        keyType == that.keyType &&
+        publicKeyUseType == that.publicKeyUseType &&
+        keyOperations == that.keyOperations &&
+        algorithmType == that.algorithmType &&
+        keyId == that.keyId &&
+        x509Url == that.x509Url &&
+        x509CertificateSHA256Thumbprint == that.x509CertificateSHA256Thumbprint &&
+        x509CertificateSHA1Thumbprint == that.x509CertificateSHA1Thumbprint &&
+        x509CertificateChain == that.x509CertificateChain
     case _ => false
   }
 

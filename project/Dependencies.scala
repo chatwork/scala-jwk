@@ -7,8 +7,8 @@ object scalaLang {
 
 object circe {
   val version           = "0.13.0"
-  val core: ModuleID    = "io.circe" %% "circe-core" % version
-  val parser: ModuleID  = "io.circe" %% "circe-parser" % version
+  val core: ModuleID    = "io.circe" %% "circe-core"    % version
+  val parser: ModuleID  = "io.circe" %% "circe-parser"  % version
   val generic: ModuleID = "io.circe" %% "circe-generic" % version
 }
 

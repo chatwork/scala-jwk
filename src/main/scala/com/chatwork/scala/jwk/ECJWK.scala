@@ -191,13 +191,15 @@ class ECJWK private[jwk] (
           dx <- x.decodeToBigInt.left.map(error => PublicKeyCreationError(error.message))
           dy <- y.decodeToBigInt.left.map(error => PublicKeyCreationError(error.message))
           publicKeySpec = new ECPublicKeySpec(new ECPoint(dx.bigInteger, dy.bigInteger), spec)
-          result <- try {
-            val keyFactory = provider.map(p => KeyFactory.getInstance("EC", p)).getOrElse(KeyFactory.getInstance("EC"))
-            Right(keyFactory.generatePublic(publicKeySpec).asInstanceOf[ECPublicKey])
-          } catch {
-            case e @ (_: NoSuchAlgorithmException | _: InvalidKeySpecException) =>
-              Left(PublicKeyCreationError(e.getMessage))
-          }
+          result <-
+            try {
+              val keyFactory =
+                provider.map(p => KeyFactory.getInstance("EC", p)).getOrElse(KeyFactory.getInstance("EC"))
+              Right(keyFactory.generatePublic(publicKeySpec).asInstanceOf[ECPublicKey])
+            } catch {
+              case e @ (_: NoSuchAlgorithmException | _: InvalidKeySpecException) =>
+                Left(PublicKeyCreationError(e.getMessage))
+            }
         } yield result
       }
       .getOrElse(Left(PublicKeyCreationError("Couldn't get EC parameter spec for curve " + curve)))
@@ -213,14 +215,15 @@ class ECJWK private[jwk] (
             for {
               dx <- _d.decodeToBigInt.left.map(error => PrivateKeyCreationError(error.message))
               privateKeySpec = new ECPrivateKeySpec(dx.bigInteger, spec)
-              result <- try {
-                val keyFactory =
-                  provider.map(p => KeyFactory.getInstance("EC", p)).getOrElse(KeyFactory.getInstance("EC"))
-                Right(Some(keyFactory.generatePrivate(privateKeySpec).asInstanceOf[ECPrivateKey]))
-              } catch {
-                case e @ (_: NoSuchAlgorithmException | _: InvalidKeySpecException) =>
-                  Left(PrivateKeyCreationError(e.getMessage))
-              }
+              result <-
+                try {
+                  val keyFactory =
+                    provider.map(p => KeyFactory.getInstance("EC", p)).getOrElse(KeyFactory.getInstance("EC"))
+                  Right(Some(keyFactory.generatePrivate(privateKeySpec).asInstanceOf[ECPrivateKey]))
+                } catch {
+                  case e @ (_: NoSuchAlgorithmException | _: InvalidKeySpecException) =>
+                    Left(PrivateKeyCreationError(e.getMessage))
+                }
             } yield result
           }
           .getOrElse(Left(PrivateKeyCreationError("Couldn't get EC parameter spec for curve " + curve)))
@@ -282,12 +285,12 @@ class ECJWK private[jwk] (
   override def equals(other: Any): Boolean = other match {
     case that: ECJWK =>
       super.equals(that) &&
-      (that canEqual this) &&
-      curve == that.curve &&
-      x == that.x &&
-      y == that.y &&
-      d == that.d &&
-      privateKey == that.privateKey
+        (that canEqual this) &&
+        curve == that.curve &&
+        x == that.x &&
+        y == that.y &&
+        d == that.d &&
+        privateKey == that.privateKey
     case _ => false
   }
 

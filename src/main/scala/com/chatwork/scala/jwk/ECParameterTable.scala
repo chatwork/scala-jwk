@@ -89,29 +89,35 @@ object ECParameterTable {
   }
 
   def get(spec: ECParameterSpec): Option[Curve] = {
-    if (spec.getCurve.getField.getFieldSize == P_256_SPEC.getCurve.getField.getFieldSize &&
-        spec.getCurve.getA.equals(P_256_SPEC.getCurve.getA) &&
-        spec.getCurve.getB.equals(P_256_SPEC.getCurve.getB) &&
-        spec.getGenerator.getAffineX.equals(P_256_SPEC.getGenerator.getAffineX) &&
-        spec.getGenerator.getAffineY.equals(P_256_SPEC.getGenerator.getAffineY) &&
-        spec.getOrder.equals(P_256_SPEC.getOrder) &&
-        spec.getCofactor == P_256_SPEC.getCofactor) {
+    if (
+      spec.getCurve.getField.getFieldSize == P_256_SPEC.getCurve.getField.getFieldSize &&
+      spec.getCurve.getA.equals(P_256_SPEC.getCurve.getA) &&
+      spec.getCurve.getB.equals(P_256_SPEC.getCurve.getB) &&
+      spec.getGenerator.getAffineX.equals(P_256_SPEC.getGenerator.getAffineX) &&
+      spec.getGenerator.getAffineY.equals(P_256_SPEC.getGenerator.getAffineY) &&
+      spec.getOrder.equals(P_256_SPEC.getOrder) &&
+      spec.getCofactor == P_256_SPEC.getCofactor
+    ) {
       Some(Curve.P_256)
-    } else if (spec.getCurve.getField.getFieldSize == P_384_SPEC.getCurve.getField.getFieldSize &&
-               spec.getCurve.getA.equals(P_384_SPEC.getCurve.getA) &&
-               spec.getCurve.getB.equals(P_384_SPEC.getCurve.getB) &&
-               spec.getGenerator.getAffineX.equals(P_384_SPEC.getGenerator.getAffineX) &&
-               spec.getGenerator.getAffineY.equals(P_384_SPEC.getGenerator.getAffineY) &&
-               spec.getOrder.equals(P_384_SPEC.getOrder) &&
-               spec.getCofactor == P_384_SPEC.getCofactor) {
+    } else if (
+      spec.getCurve.getField.getFieldSize == P_384_SPEC.getCurve.getField.getFieldSize &&
+      spec.getCurve.getA.equals(P_384_SPEC.getCurve.getA) &&
+      spec.getCurve.getB.equals(P_384_SPEC.getCurve.getB) &&
+      spec.getGenerator.getAffineX.equals(P_384_SPEC.getGenerator.getAffineX) &&
+      spec.getGenerator.getAffineY.equals(P_384_SPEC.getGenerator.getAffineY) &&
+      spec.getOrder.equals(P_384_SPEC.getOrder) &&
+      spec.getCofactor == P_384_SPEC.getCofactor
+    ) {
       Some(Curve.P_384)
-    } else if (spec.getCurve.getField.getFieldSize == P_521_SPEC.getCurve.getField.getFieldSize &&
-               spec.getCurve.getA.equals(P_521_SPEC.getCurve.getA) &&
-               spec.getCurve.getB.equals(P_521_SPEC.getCurve.getB) &&
-               spec.getGenerator.getAffineX.equals(P_521_SPEC.getGenerator.getAffineX) &&
-               spec.getGenerator.getAffineY.equals(P_521_SPEC.getGenerator.getAffineY) &&
-               spec.getOrder.equals(P_521_SPEC.getOrder) &&
-               spec.getCofactor == P_521_SPEC.getCofactor) {
+    } else if (
+      spec.getCurve.getField.getFieldSize == P_521_SPEC.getCurve.getField.getFieldSize &&
+      spec.getCurve.getA.equals(P_521_SPEC.getCurve.getA) &&
+      spec.getCurve.getB.equals(P_521_SPEC.getCurve.getB) &&
+      spec.getGenerator.getAffineX.equals(P_521_SPEC.getGenerator.getAffineX) &&
+      spec.getGenerator.getAffineY.equals(P_521_SPEC.getGenerator.getAffineY) &&
+      spec.getOrder.equals(P_521_SPEC.getOrder) &&
+      spec.getCofactor == P_521_SPEC.getCofactor
+    ) {
       Some(Curve.P_521)
     } else {
       None
