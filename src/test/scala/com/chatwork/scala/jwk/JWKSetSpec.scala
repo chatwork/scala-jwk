@@ -59,7 +59,7 @@ class JWKSetSpec extends AnyFreeSpec with Matchers with JWKSetJsonImplicits {
            |}
          """.stripMargin
       val jwkSet = parse(jwkSetJsonText).flatMap { json => json.as[JWKSet] }
-      jwkSet.right.get.size shouldBe 2
+      jwkSet.getOrElse(???).size shouldBe 2
       def rsaJwk(kid: String) = new RSAJWK(
         n = Base64String(
           "n4EPtAOCc9AlkeQHPzHStgAbgs7bTZLwUBZdR8_KuKPEHLd4rHVTeT" +
@@ -134,7 +134,7 @@ class JWKSetSpec extends AnyFreeSpec with Matchers with JWKSetJsonImplicits {
           )
         )
       )
-      jwkSet.right.get shouldBe JWKSet(rsaJwk("1"), rsaJwk("2"))
+      jwkSet.getOrElse(???) shouldBe JWKSet(rsaJwk("1"), rsaJwk("2"))
       println(jwkSet)
     }
   }

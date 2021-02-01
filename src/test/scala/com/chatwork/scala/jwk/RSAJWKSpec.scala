@@ -221,8 +221,8 @@ class RSAJWKSpec extends AnyFreeSpec with Matchers with RSAJWKJsonImplicits {
         .map(_.bigInteger)
       // Key pair import, 1st private form
       val key2 = RSAJWK.fromPublicKeyWithPrivateKey(
-        rsaPublicKey = pubKey.right.get,
-        rsaPrivateKey = privKey2.right.get,
+        rsaPublicKey = pubKey.getOrElse(???),
+        rsaPrivateKey = privKey2.getOrElse(???),
         publicKeyUseType = Some(PublicKeyUseType.Signature),
         keyOperations = KeyOperations.empty,
         algorithmType = Some(JWSAlgorithmType.RS256),
@@ -255,8 +255,8 @@ class RSAJWKSpec extends AnyFreeSpec with Matchers with RSAJWKJsonImplicits {
 
       // Key pair import, 2nd private form
       val key3 = RSAJWK.fromPublicKeyWithPrivateCrtKey(
-        pubKey.right.get,
-        privCrtKey2.right.get,
+        pubKey.getOrElse(???),
+        privCrtKey2.getOrElse(???),
         publicKeyUseType = Some(PublicKeyUseType.Signature),
         keyOperations = KeyOperations.empty,
         algorithmType = Some(JWSAlgorithmType.RS256),
@@ -381,14 +381,17 @@ class RSAJWKSpec extends AnyFreeSpec with Matchers with RSAJWKJsonImplicits {
       base64StringFactory
         .encode(rsaPublicKeyIn.getEncoded)
         .map(_.asString) shouldBe base64StringFactory
-        .encode(rsaPublicKeyOut.right.get.right.get.getEncoded)
+        .encode(rsaPublicKeyOut.flatMap(identity).getOrElse(???).getEncoded)
         .map(_.asString)
       base64StringFactory
         .encode(rsaPrivateKeyIn.getEncoded)
         .map(_.asString) shouldBe base64StringFactory
-        .encode(rsaPrivateKeyOut.right.get.right.get.get.getEncoded)
+        .encode(rsaPrivateKeyOut.flatMap(_.flatMap(_.toRight(???))).getOrElse(???).getEncoded)
         .map(_.asString)
-      val key2 = RSAJWK.fromKeyPair(rsaPublicKeyOut.right.get.right.get, rsaPrivateKeyOut.right.get.right.get.get)
+      val key2 = RSAJWK.fromKeyPair(
+        rsaPublicKeyOut.flatMap(identity).getOrElse(???),
+        rsaPrivateKeyOut.flatMap(_.flatMap(_.toRight(???))).getOrElse(???)
+      )
       key2.flatMap(_.publicExponent.decodeToBigInt.map(_.bigInteger)) shouldBe Right(rsaPublicKeyIn.getPublicExponent)
       key2.flatMap(_.modulus.decodeToBigInt.map(_.bigInteger)) shouldBe Right(rsaPublicKeyIn.getModulus)
       key2.map(_.privateExponent.map(_.decodeToBigInt.map(_.bigInteger))) shouldBe Right(
