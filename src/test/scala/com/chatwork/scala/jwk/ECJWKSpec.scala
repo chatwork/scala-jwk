@@ -36,10 +36,10 @@ class ECJWKSpec extends AnyFreeSpec with Matchers with ECJWKJsonImplicits with E
   }
   "ECJWK" - {
     "key size" in {
-      ECJWK(P_256.crv, P_256.x, P_256.y, d = Some(P_256.d)).right.value.size.right.value shouldBe 256
-      ECJWK(P_256_Alt.crv, P_256_Alt.x, P_256_Alt.y).right.value.size.right.value shouldBe 256
-      ECJWK(P_384_Alt.crv, P_384_Alt.x, P_384_Alt.y).right.value.size.right.value shouldBe 384
-      ECJWK(P_521_Alt.crv, P_521_Alt.x, P_521_Alt.y).right.value.size.right.value shouldBe 521
+      ECJWK(P_256.crv, P_256.x, P_256.y, d = Some(P_256.d)).value.size.value shouldBe 256
+      ECJWK(P_256_Alt.crv, P_256_Alt.x, P_256_Alt.y).value.size.value shouldBe 256
+      ECJWK(P_384_Alt.crv, P_384_Alt.x, P_384_Alt.y).value.size.value shouldBe 384
+      ECJWK(P_521_Alt.crv, P_521_Alt.x, P_521_Alt.y).value.size.value shouldBe 521
     }
     "supported Curves Constant" in {
       ECJWK.SUPPORTED_CURVES.contains(Curve.P_256) shouldBe true
@@ -64,10 +64,10 @@ class ECJWKSpec extends AnyFreeSpec with Matchers with ECJWKJsonImplicits with E
         "\"x\":\"CEuRLUISufhcjrj-32N0Bvl3KPMiHH9iSw4ohN9jxrA\"," +
         "\"y\":\"EldWz_iXSK3l_S7n4w_t3baxos7o9yqX0IjzG959vHc\"," +
         "\"crv\":\"P-256\"}"
-      val jwk = ECJWK.parseFromText(json).right.value
+      val jwk = ECJWK.parseFromText(json).value
       jwk.keyType shouldBe KeyType.EC
       jwk.curve shouldBe Curve.P_256
-      val result = jwk.computeThumbprint.right.value
+      val result = jwk.computeThumbprint.value
       result.asString shouldBe "W6b8Mt2xhDFiy8sJe-MoWXIIkbty0HDhRjfI3VYWH6s"
     }
     "testJose4jVectorP384" in {
@@ -75,10 +75,10 @@ class ECJWKSpec extends AnyFreeSpec with Matchers with ECJWKJsonImplicits with E
         " \"x\":\"2jCG5DmKUql9YPn7F2C-0ljWEbj8O8-vn5Ih1k7Wzb-y3NpBLiG1BiRa392b1kcQ\"," +
         " \"y\":\"7Ragi9rT-5tSzaMbJlH_EIJl6rNFfj4V4RyFM5U2z4j1hesX5JXa8dWOsE-5wPIl\"," +
         " \"crv\":\"P-384\"}"
-      val jwk = ECJWK.parseFromText(json).right.value
+      val jwk = ECJWK.parseFromText(json).value
       jwk.keyType shouldBe KeyType.EC
       jwk.curve shouldBe Curve.P_384
-      val result = jwk.computeThumbprint.right.value
+      val result = jwk.computeThumbprint.value
       result.asString shouldBe "S-6tPnrLPensd2med1er_jX_j7mythdvKIj9O_sNqL0"
     }
     "testJose4jVectorP521" in {
@@ -86,10 +86,10 @@ class ECJWKSpec extends AnyFreeSpec with Matchers with ECJWKJsonImplicits with E
         "\"x\":\"Aeq3uMrb3iCQEt0PzSeZMmrmYhsKP5DM1oMP6LQzTFQY9-F3Ab45xiK4AJxltXEI-87g3gRwId88hTyHgq180JDt\"," +
         "\"y\":\"ARA0lIlrZMEzaXyXE4hjEkc50y_JON3qL7HSae9VuWpOv_2kit8p3pyJBiRb468_U5ztLT7FvDvtimyS42trhDTu\"," +
         "\"crv\":\"P-521\"}"
-      val jwk = ECJWK.parseFromText(json).right.value
+      val jwk = ECJWK.parseFromText(json).value
       jwk.keyType shouldBe KeyType.EC
       jwk.curve shouldBe Curve.P_521
-      val result = jwk.computeThumbprint.right.value
+      val result = jwk.computeThumbprint.value
       result.asString shouldBe "EroitZ-og3Ji6ENuMuey6vEz4hA2i56rOJHfrTeDHII"
     }
   }
