@@ -16,9 +16,10 @@ object JWSAlgorithmType extends AlgorithmTypeFactory[JWSAlgorithmType] {
   case object HS384 extends JWSAlgorithmType("HS384", Requirement.Optional)
   case object HS512 extends JWSAlgorithmType("HS512", Requirement.Optional)
 
-  case object RS256 extends JWSAlgorithmType("RS256", Requirement.Recommended)
-  case object RS384 extends JWSAlgorithmType("RS384", Requirement.Optional)
-  case object RS512 extends JWSAlgorithmType("RS512", Requirement.Optional)
+  case object RS256   extends JWSAlgorithmType("RS256", Requirement.Recommended)
+  case object RS384   extends JWSAlgorithmType("RS384", Requirement.Optional)
+  case object RS512   extends JWSAlgorithmType("RS512", Requirement.Optional)
+  case object RSAOAEP extends JWSAlgorithmType("RSA-OAEP", Requirement.Optional)
 
   case object ES256 extends JWSAlgorithmType("ES256", Requirement.Recommended)
   case object ES384 extends JWSAlgorithmType("ES384", Requirement.Optional)
@@ -38,7 +39,7 @@ object JWSAlgorithmType extends AlgorithmTypeFactory[JWSAlgorithmType] {
       override val values: Set[JWSAlgorithmType] = Set(HS256, HS384, HS512)
     }
     case object RSA extends AlgorithmFamily {
-      override val values: Set[JWSAlgorithmType] = Set(RS256, RS384, RS512, PS256, PS384, PS512)
+      override val values: Set[JWSAlgorithmType] = Set(RS256, RS384, RS512, PS256, PS384, PS512, RSAOAEP)
     }
     case object EC extends AlgorithmFamily {
       override val values: Set[JWSAlgorithmType] = Set(ES256, ES384, ES512)
