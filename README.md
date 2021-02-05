@@ -11,17 +11,8 @@ Add the following to your sbt build (2.12.x, 2.13.x):
 ```scala
 resolvers += "Sonatype OSS Release Repository" at "https://oss.sonatype.org/content/repositories/releases/"
 
-libraryDependencies += "com.chatwork" %% "scala-jwk" % "1.0.5"
+libraryDependencies += "com.chatwork" %% "scala-jwk" % "1.1.0"
 ```
-
-### Snapshot Version
-
-```scala
-resolvers += "Sonatype OSS Snapshot Repository" at "https://oss.sonatype.org/content/repositories/snapshots/"
-
-libraryDependencies += "com.chatwork" %% "scala-jwk" % "1.0.6-SNAPSHOT"
-```
-
 
 ## How to use
 
