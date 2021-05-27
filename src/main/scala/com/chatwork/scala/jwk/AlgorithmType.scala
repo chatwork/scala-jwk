@@ -1,12 +1,11 @@
 package com.chatwork.scala.jwk
 
-import enumeratum._
-
-trait AlgorithmType extends EnumEntry {
+trait AlgorithmType extends Product with Serializable {
+  val entryName: String
   val requirement: Requirement
 }
 
-trait AlgorithmTypeFactory[A <: AlgorithmType] extends Enum[A] {
+trait AlgorithmTypeFactory[A <: AlgorithmType] {
 
   case object None extends AlgorithmType {
     override val entryName                = "none"

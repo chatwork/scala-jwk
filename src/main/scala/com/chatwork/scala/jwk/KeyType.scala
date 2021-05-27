@@ -1,15 +1,17 @@
 package com.chatwork.scala.jwk
 
-import enumeratum._
 import io.circe.{ Decoder, Encoder }
 
 import scala.collection.immutable
 
-sealed abstract class KeyType(override val entryName: String) extends EnumEntry
+sealed abstract class KeyType(val entryName: String) extends Product with Serializable
 
-object KeyType extends Enum[KeyType] {
+object KeyType {
 
-  override val values: immutable.IndexedSeq[KeyType] = findValues
+  val values: immutable.IndexedSeq[KeyType] = immutable.IndexedSeq(RSA, EC)
+
+  def withNameEither(name: String): Either[String, KeyType] =
+    values.find(_.entryName == name).toRight(s"Unknown key type $name")
 
   case object RSA extends KeyType("RSA")
 
@@ -23,6 +25,7 @@ trait KeyTypeJsonImplicits {
 
   implicit val KeyTypeJsonEncoder: Encoder[KeyType] = Encoder[String].contramap(_.entryName)
 
-  implicit val KeyTypeJsonDecoder: Decoder[KeyType] = Decoder[String].map(KeyType.withName)
+  implicit val KeyTypeJsonDecoder: Decoder[KeyType] =
+    Decoder[String].map(name => KeyType.withNameEither(name).getOrElse(KeyType.Other(name)))
 
 }

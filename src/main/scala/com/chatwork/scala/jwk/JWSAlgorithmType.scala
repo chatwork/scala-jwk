@@ -1,6 +1,5 @@
 package com.chatwork.scala.jwk
 
-import enumeratum._
 import io.circe.{ Decoder, Encoder }
 
 import scala.collection.immutable
@@ -10,7 +9,11 @@ sealed abstract class JWSAlgorithmType(override val entryName: String, override 
 
 object JWSAlgorithmType extends AlgorithmTypeFactory[JWSAlgorithmType] {
 
-  override def values: immutable.IndexedSeq[JWSAlgorithmType] = findValues
+  def values: immutable.IndexedSeq[JWSAlgorithmType] =
+    immutable.IndexedSeq(HS256, HS384, HS512, RS256, RS384, RS512, RSAOAEP, ES256, ES384, ES512, PS256, PS384, PS512)
+
+  def withNameEither(name: String): Either[String, JWSAlgorithmType] =
+    values.find(_.entryName == name).toRight(s"Unknown algorithm type $name")
 
   case object HS256 extends JWSAlgorithmType("HS256", Requirement.Required)
   case object HS384 extends JWSAlgorithmType("HS384", Requirement.Optional)
@@ -29,19 +32,23 @@ object JWSAlgorithmType extends AlgorithmTypeFactory[JWSAlgorithmType] {
   case object PS384 extends JWSAlgorithmType("PS384", Requirement.Optional)
   case object PS512 extends JWSAlgorithmType("PS512", Requirement.Optional)
 
-  sealed trait AlgorithmFamily extends EnumEntry {
+  sealed trait AlgorithmFamily {
+    val entryName: String
     val values: Set[JWSAlgorithmType]
   }
 
-  object AlgorithmFamily extends Enum[AlgorithmFamily] {
-    override def values: immutable.IndexedSeq[AlgorithmFamily] = findValues
+  object AlgorithmFamily {
+    def values: immutable.IndexedSeq[AlgorithmFamily] = immutable.IndexedSeq(HMacSHA, RSA, EC)
     case object HMacSHA extends AlgorithmFamily {
+      override val entryName: String             = "HMacSHA"
       override val values: Set[JWSAlgorithmType] = Set(HS256, HS384, HS512)
     }
     case object RSA extends AlgorithmFamily {
+      override val entryName: String             = "RSA"
       override val values: Set[JWSAlgorithmType] = Set(RS256, RS384, RS512, PS256, PS384, PS512, RSAOAEP)
     }
     case object EC extends AlgorithmFamily {
+      override val entryName: String             = "EC"
       override val values: Set[JWSAlgorithmType] = Set(ES256, ES384, ES512)
     }
   }
@@ -51,6 +58,7 @@ trait JWSAlgorithmTypeJsonImplicits {
 
   implicit val JWSAlgorithmTypeJsonEncoder: Encoder[JWSAlgorithmType] = Encoder[String].contramap(_.entryName)
 
-  implicit val jWSAlgorithmTypeJsonDecoder: Decoder[JWSAlgorithmType] = Decoder[String].map(JWSAlgorithmType.withName)
+  implicit val jWSAlgorithmTypeJsonDecoder: Decoder[JWSAlgorithmType] =
+    Decoder[String].emap(JWSAlgorithmType.withNameEither)
 
 }

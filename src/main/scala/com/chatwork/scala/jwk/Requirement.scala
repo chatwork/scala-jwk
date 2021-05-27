@@ -1,16 +1,15 @@
 package com.chatwork.scala.jwk
 
-import enumeratum._
-
 import scala.collection.immutable
 
-sealed trait Requirement extends EnumEntry
+sealed abstract class Requirement(val entryName: String) extends Product with Serializable
 
-object Requirement extends Enum[Requirement] {
-  override def values: immutable.IndexedSeq[Requirement] = findValues
+object Requirement {
+  def values: immutable.IndexedSeq[Requirement] =
+    immutable.IndexedSeq(Required, Recommended, Optional)
 
-  case object Required    extends Requirement
-  case object Recommended extends Requirement
-  case object Optional    extends Requirement
+  case object Required    extends Requirement("Required")
+  case object Recommended extends Requirement("Recommended")
+  case object Optional    extends Requirement("Optional")
 
 }
