@@ -21,7 +21,7 @@ object beachape {
 }
 
 object scalacheck {
-  val scalacheck = "org.scalacheck" %% "scalacheck" % "1.15.2"
+  val scalacheck = "org.scalacheck" %% "scalacheck" % "1.15.3"
 }
 
 object j5ik2o {
