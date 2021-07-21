@@ -23,7 +23,7 @@ object scalatest {
 }
 
 object scalacheck {
-  val scalacheck = "org.scalacheck" %% "scalacheck" % "1.15.3"
+  val scalacheck = "org.scalacheck" %% "scalacheck" % "1.15.4"
 }
 
 object j5ik2o {
