@@ -17,7 +17,9 @@ Add the following to your sbt build (2.12.x, 2.13.x, 3.0.x):
 ```scala
 resolvers += "Sonatype OSS Release Repository" at "https://oss.sonatype.org/content/repositories/releases/"
 
-libraryDependencies += "com.chatwork" %% "scala-jwk" % "1.1.0"
+val version = "..."
+
+libraryDependencies += "com.chatwork" %% "scala-jwk" % version
 ```
 
 ## How to use
