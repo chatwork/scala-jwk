@@ -416,10 +416,10 @@ class RSAJWK private[jwk] (
         )
       } yield spec
     }.getOrElse {
-      Right[PrivateKeyCreationError, RSAPrivateKeySpec](
-        new RSAPrivateKeySpec(_modulus.bigInteger, _privateExponent.bigInteger)
-      )
-    }
+        Right[PrivateKeyCreationError, RSAPrivateKeySpec](
+          new RSAPrivateKeySpec(_modulus.bigInteger, _privateExponent.bigInteger)
+        )
+      }
   }
 
   private def createInternalPrivateKeySpec(
@@ -450,7 +450,10 @@ class RSAJWK private[jwk] (
             .left
             .map(e => PrivateKeyCreationError(e.message))
         } yield new RSAOtherPrimeInfo(otherPrime, otherPrimeExponent, otherCrtCoefficient)
-        for { result <- r; _e <- e } yield result :+ _e
+        for {
+          result <- r
+          _e     <- e
+        } yield result :+ _e
       }
       .map { otherPrimeSeq =>
         if (otherPrimeSeq.nonEmpty)

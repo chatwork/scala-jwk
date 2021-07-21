@@ -1,91 +1,94 @@
-val scala212Version = "2.12.13"
-val scala213Version = "2.13.6"
-val scala3Version   = "3.0.1"
+import sbt._
 
-sonatypeProfileName := "com.chatwork"
-
-organization := "com.chatwork"
-
-name := "scala-jwk"
-
-scalaVersion := scala213Version
-
-crossScalaVersions := Seq(scala212Version, scala213Version, scala3Version)
-
-scalacOptions ++= Seq(
-  "-feature",
-  "-deprecation",
-  "-unchecked",
-  "-encoding",
-  "UTF-8",
-  "-language:_"
-)
-
-scalacOptions ++= {
-  CrossVersion.partialVersion(scalaVersion.value) match {
+def crossScalacOptions(scalaVersion: String): Seq[String] =
+  CrossVersion.partialVersion(scalaVersion) match {
     case Some((3L, _)) =>
-      Seq.empty
-    case Some((2L, scalaMajor)) if scalaMajor >= 12 =>
-      Seq.empty
-    case Some((2L, scalaMajor)) if scalaMajor <= 11 =>
       Seq(
-        "-Yinline-warnings"
+        "-source:3.0-migration",
+        "-Xignore-scala2-macros"
+      )
+    case Some((2L, scalaMajor)) if scalaMajor >= 12 =>
+      Seq(
+        "-Ydelambdafy:method",
+        "-target:jvm-1.8",
+        "-Yrangepos",
+        "-Ywarn-unused"
       )
   }
-}
 
-resolvers ++= Seq(
-  "Sonatype OSS Snapshot Repository" at "https://oss.sonatype.org/content/repositories/snapshots/",
-  "Sonatype OSS Release Repository" at "https://oss.sonatype.org/content/repositories/releases/"
+lazy val baseSettings = Seq(
+  organization := "com.chatwork",
+  homepage := Some(url("https://github.com/chatwork/scala-jwk")),
+  licenses := List("The MIT License" -> url("http://opensource.org/licenses/MIT")),
+  developers := List(
+    Developer(
+      id = "j5ik2o",
+      name = "Junichi Kato",
+      email = "j5ik2o@gmail.com",
+      url = url("https://blog.j5ik2o.me")
+    ),
+    Developer(
+      id = "exoego",
+      name = "TATSUNO Yasuhiro",
+      email = "ytatsuno.jp@gmail.com",
+      url = url("https://www.exoego.net")
+    )
+  ),
+  scalaVersion := Versions.scala213Version,
+  crossScalaVersions := Seq(Versions.scala212Version, Versions.scala213Version, Versions.scala3Version),
+  scalacOptions ++= (Seq(
+    "-unchecked",
+    "-feature",
+    "-deprecation",
+    "-encoding",
+    "UTF-8",
+    "-language:_"
+  ) ++ crossScalacOptions(scalaVersion.value)),
+  resolvers ++= Seq(
+    Resolver.sonatypeRepo("snapshots")
+  ),
+  Test / publishArtifact := false,
+  Test / parallelExecution := false,
+  Compile / doc / sources := {
+    val old = (Compile / doc / sources).value
+    if (scalaVersion.value == Versions.scala3Version) {
+      Nil
+    } else {
+      old
+    }
+  },
+  semanticdbEnabled := true,
+  semanticdbVersion := scalafixSemanticdb.revision,
+  // Remove me when scalafix is stable and feature-complete on Scala 3
+  ThisBuild / scalafixScalaBinaryVersion := (CrossVersion.partialVersion(scalaVersion.value) match {
+    case Some((2, _)) => CrossVersion.binaryScalaVersion(scalaVersion.value)
+    case _            => CrossVersion.binaryScalaVersion(Versions.scala212Version)
+  })
 )
 
-libraryDependencies ++= Seq(
-  scalatest.scalatest   % Test,
-  scalacheck.scalacheck % Test,
-  scalaLang.java8Compat,
-  j5ik2o.base64scala,
-  circe.core,
-  circe.generic,
-  circe.parser
-)
+val library = (project in file("library"))
+  .settings(baseSettings)
+  .settings(
+    name := "scala-jwk",
+    libraryDependencies ++= Seq(
+      scalatest.scalatest   % Test,
+      scalacheck.scalacheck % Test,
+      scalaLang.java8Compat,
+      j5ik2o.base64scala,
+      circe.core,
+      circe.generic,
+      circe.parser
+    )
+  )
 
-updateOptions := updateOptions.value.withCachedResolution(true)
+val root = (project in file("."))
+  .settings(baseSettings)
+  .settings(
+    name := "scala-jwk-root",
+    publish / skip := true
+  )
+  .aggregate(library)
 
-Test / parallelExecution := false
-
-Test / run / javaOptions ++= Seq("-Xms4g", "-Xmx4g", "-Xss10M", "-XX:+CMSClassUnloadingEnabled")
-
-publishMavenStyle := true
-
-Test / publishArtifact := false
-
-pomIncludeRepository := { _ => false }
-
-pomExtra := {
-  <url>https://github.com/chatwork/scala-jwk</url>
-    <licenses>
-      <license>
-        <name>The MIT License</name>
-        <url>http://opensource.org/licenses/MIT</url>
-      </license>
-    </licenses>
-    <scm>
-      <url>git@github.com:chatwork/scala-jwk.git</url>
-      <connection>scm:git:github.com/chatwork/scala-jwk</connection>
-      <developerConnection>scm:git:git@github.com:chatwork/scala-jwk.git</developerConnection>
-    </scm>
-    <developers>
-      <developer>
-        <id>j5ik2o</id>
-        <name>Junichi Kato</name>
-      </developer>
-    </developers>
-}
-
-publishTo := sonatypePublishToBundle.value
-
-credentials := {
-  val ivyCredentials = (LocalRootProject / baseDirectory).value / ".credentials"
-  val gpgCredentials = (LocalRootProject / baseDirectory).value / ".gpgCredentials"
-  Credentials(ivyCredentials) :: Credentials(gpgCredentials) :: Nil
-}
+// --- Custom commands
+addCommandAlias("lint", ";scalafmtCheck;test:scalafmtCheck;scalafmtSbtCheck;scalafixAll --check")
+addCommandAlias("fmt", ";scalafmtAll;scalafmtSbt;scalafix RemoveUnused")

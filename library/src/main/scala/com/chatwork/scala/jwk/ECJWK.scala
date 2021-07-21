@@ -111,7 +111,7 @@ object ECJWK extends ECJWKJsonImplicits {
 
   val SUPPORTED_CURVES = Set(Curve.P_256, Curve.P_256K, Curve.P_384, Curve.P_521)
 
-  private def ensurePublicCoordinatesOnCurve(curve: Curve, x: Base64String, y: Base64String) = {
+  private def ensurePublicCoordinatesOnCurve(curve: Curve, x: Base64String, y: Base64String): Unit = {
     require(SUPPORTED_CURVES.contains(curve), "Unknown / unsupported curve: " + curve)
     val result = for {
       dx <- x.decodeToBigInt
@@ -299,7 +299,7 @@ class ECJWK private[jwk] (
     state.map(_.hashCode()).foldLeft(super.hashCode())((a, b) => 31 * a + b)
   }
 
-  override def toString =
+  override def toString: String =
     Seq(
       curve,
       x,

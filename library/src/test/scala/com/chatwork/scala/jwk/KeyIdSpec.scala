@@ -8,7 +8,6 @@ import java.util.UUID
 import com.github.j5ik2o.base64scala.Base64String
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.freespec.AnyFreeSpec
-import cats.syntax.either._
 
 class KeyIdSpec extends AnyFreeSpec with Matchers {
 
