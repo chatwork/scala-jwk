@@ -18,8 +18,8 @@ def crossScalacOptions(scalaVersion: String): Seq[String] =
 
 lazy val baseSettings = Seq(
   organization := "com.chatwork",
-  homepage := Some(url("https://github.com/chatwork/scala-jwk")),
-  licenses := List("The MIT License" -> url("http://opensource.org/licenses/MIT")),
+  homepage     := Some(url("https://github.com/chatwork/scala-jwk")),
+  licenses     := List("The MIT License" -> url("http://opensource.org/licenses/MIT")),
   developers := List(
     Developer(
       id = "j5ik2o",
@@ -34,7 +34,7 @@ lazy val baseSettings = Seq(
       url = url("https://www.exoego.net")
     )
   ),
-  scalaVersion := Versions.scala213Version,
+  scalaVersion       := Versions.scala213Version,
   crossScalaVersions := Seq(Versions.scala212Version, Versions.scala213Version, Versions.scala3Version),
   scalacOptions ++= (Seq(
     "-unchecked",
@@ -47,7 +47,7 @@ lazy val baseSettings = Seq(
   resolvers ++= Seq(
     Resolver.sonatypeRepo("snapshots")
   ),
-  Test / publishArtifact := false,
+  Test / publishArtifact   := false,
   Test / parallelExecution := false,
   Compile / doc / sources := {
     val old = (Compile / doc / sources).value
@@ -84,7 +84,7 @@ val library = (project in file("library"))
 val root = (project in file("."))
   .settings(baseSettings)
   .settings(
-    name := "scala-jwk-root",
+    name           := "scala-jwk-root",
     publish / skip := true
   )
   .aggregate(library)
