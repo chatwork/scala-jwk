@@ -1,5 +1,6 @@
 val scala212Version = "2.12.13"
-val scala213Version = "2.13.4"
+val scala213Version = "2.13.6"
+val scala3Version   = "3.0.1"
 
 sonatypeProfileName := "com.chatwork"
 
@@ -9,7 +10,7 @@ name := "scala-jwk"
 
 scalaVersion := scala213Version
 
-crossScalaVersions := Seq(scala212Version, scala213Version)
+crossScalaVersions := Seq(scala212Version, scala213Version, scala3Version)
 
 scalacOptions ++= Seq(
   "-feature",
@@ -22,6 +23,8 @@ scalacOptions ++= Seq(
 
 scalacOptions ++= {
   CrossVersion.partialVersion(scalaVersion.value) match {
+    case Some((3L, _)) =>
+      Seq.empty
     case Some((2L, scalaMajor)) if scalaMajor >= 12 =>
       Seq.empty
     case Some((2L, scalaMajor)) if scalaMajor <= 11 =>
@@ -39,7 +42,6 @@ resolvers ++= Seq(
 libraryDependencies ++= Seq(
   scalatest.scalatest   % Test,
   scalacheck.scalacheck % Test,
-  beachape.enumeratum,
   scalaLang.java8Compat,
   j5ik2o.base64scala,
   circe.core,
@@ -49,13 +51,13 @@ libraryDependencies ++= Seq(
 
 updateOptions := updateOptions.value.withCachedResolution(true)
 
-parallelExecution in Test := false
+Test / parallelExecution := false
 
-javaOptions in (Test, run) ++= Seq("-Xms4g", "-Xmx4g", "-Xss10M", "-XX:+CMSClassUnloadingEnabled")
+Test / run / javaOptions ++= Seq("-Xms4g", "-Xmx4g", "-Xss10M", "-XX:+CMSClassUnloadingEnabled")
 
 publishMavenStyle := true
 
-publishArtifact in Test := false
+Test / publishArtifact := false
 
 pomIncludeRepository := { _ => false }
 
@@ -83,7 +85,7 @@ pomExtra := {
 publishTo := sonatypePublishToBundle.value
 
 credentials := {
-  val ivyCredentials = (baseDirectory in LocalRootProject).value / ".credentials"
-  val gpgCredentials = (baseDirectory in LocalRootProject).value / ".gpgCredentials"
+  val ivyCredentials = (LocalRootProject / baseDirectory).value / ".credentials"
+  val gpgCredentials = (LocalRootProject / baseDirectory).value / ".gpgCredentials"
   Credentials(ivyCredentials) :: Credentials(gpgCredentials) :: Nil
 }
