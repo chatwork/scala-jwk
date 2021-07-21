@@ -1,0 +1,59 @@
+name: Bump Version
+on:
+  workflow_dispatch:
+    inputs:
+      force:
+        description: 'force release'
+        required: false
+        default: '0'
+  schedule:
+    - cron: '0 0 * * *'
+jobs:
+  bump-version:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2.3.4
+      with:
+        fetch-depth: 0
+        persist-credentials: false
+        token: ${{ secrets.CW_SCALA_STEWARD_TOKEN }}
+    - name: Calculate changes from the latest tag to HEAD
+      id: changes
+      run: |
+        LATEST_TAG=$(git describe --abbrev=0 --tags)
+        echo "latest-tag = $LATEST_TAG"
+        COUNT=$(git log $LATEST_TAG..HEAD --pretty=format:"%s" --no-merges \
+          --grep='^build:' \
+          --grep='^ci:' \
+          --grep='^feat:' \
+          --grep='^fix:' \
+          --grep='^docs:' \
+          --grep='^style:' \
+          --grep='^refactor:' \
+          --grep='^perf:' \
+          --grep='^test:' \
+          --grep='^revert:' \
+          --grep='^chore:' | awk 'END{print NR}')
+        echo "steps.changes.outputs.count = $COUNT"
+        FORCE=${{ github.event.inputs.force }}
+        if [[ "$FORCE" = "1" ]]; then
+          echo "::set-output name=count::1"
+        else
+          echo "::set-output name=count::$COUNT"
+        fi
+    - name: Bump version and push tag
+      id: tag_version
+      uses: mathieudutour/github-tag-action@v5.5
+      with:
+        github_token: ${{ secrets.CW_SCALA_STEWARD_TOKEN }}
+        default_bump: patch
+      if: steps.changes.outputs.count > 0
+    - name: Create a GitHub release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.CW_SCALA_STEWARD_TOKEN }}
+      with:
+        tag_name: ${{ steps.tag_version.outputs.new_tag }}
+        release_name: Release ${{ steps.tag_version.outputs.new_tag }}
+        body: ${{ steps.tag_version.outputs.changelog }}
+      if: steps.changes.outputs.count > 0

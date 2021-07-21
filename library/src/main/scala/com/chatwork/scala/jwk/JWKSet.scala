@@ -66,7 +66,6 @@ object JWKSet extends JWKSetJsonImplicits {
 
 trait JWKSetJsonImplicits extends JWKJsonImplicits {
   import io.circe.syntax._
-  import cats.syntax.either._
 
   implicit val JWKSetJsonEncoder: Encoder[JWKSet] = Encoder.instance { v =>
     Json.obj(

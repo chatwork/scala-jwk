@@ -1,7 +1,6 @@
 package com.chatwork.scala.jwk
 
 import com.github.j5ik2o.base64scala.Base64String
-import cats.syntax.either._
 import io.circe.parser._
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.freespec.AnyFreeSpec

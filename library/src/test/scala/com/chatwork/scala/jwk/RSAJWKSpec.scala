@@ -10,7 +10,6 @@ import io.circe.parser._
 import io.circe.syntax._
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.freespec.AnyFreeSpec
-import cats.syntax.either._
 
 class RSAJWKSpec extends AnyFreeSpec with Matchers with RSAJWKJsonImplicits {
   val base64StringFactory = Base64StringFactory(urlSafe = true, isNoPadding = true)

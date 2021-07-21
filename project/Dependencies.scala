@@ -1,6 +1,12 @@
 import sbt._
 import sbt.ModuleID
 
+object Versions {
+  val scala212Version = "2.12.13"
+  val scala213Version = "2.13.6"
+  val scala3Version   = "3.0.1"
+}
+
 object scalaLang {
   val java8Compat = "org.scala-lang.modules" %% "scala-java8-compat" % "1.0.0"
 }

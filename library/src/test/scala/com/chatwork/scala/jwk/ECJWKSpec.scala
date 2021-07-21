@@ -53,7 +53,7 @@ class ECJWKSpec extends AnyFreeSpec with Matchers with ECJWKJsonImplicits with E
       jwk match {
         case Left(e: JWKCreationError) =>
           println(e.message)
-        case Left(e) =>
+        case Left(_) =>
           fail()
         case Right(_) =>
           fail()
