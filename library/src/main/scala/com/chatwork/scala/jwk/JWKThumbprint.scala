@@ -17,8 +17,9 @@ object JWKThumbprint extends JWKJsonImplicits {
 
   def computeFromJWK(jwk: JWK, hashAlg: String = "SHA-256"): Either[JWKThumbprintError, Base64String] =
     jwk.keyType match {
-      case KeyType.EC  => computeFromJson(jwk.asJson.mapObject(_.filterKeys(requiredKeysForEC.contains)), hashAlg)
-      case KeyType.RSA => computeFromJson(jwk.asJson.mapObject(_.filterKeys(requiredKeysForRSA.contains)), hashAlg)
+      case KeyType.EC       => computeFromJson(jwk.asJson.mapObject(_.filterKeys(requiredKeysForEC.contains)), hashAlg)
+      case KeyType.RSA      => computeFromJson(jwk.asJson.mapObject(_.filterKeys(requiredKeysForRSA.contains)), hashAlg)
+      case KeyType.Other(_) => computeFromJson(jwk.asJson, hashAlg)
     }
 
   private def getDigest(json: Json, hashAlg: String): Either[JWKThumbprintError, Array[Byte]] = {
