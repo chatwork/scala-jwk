@@ -29,8 +29,7 @@ class KeyIdSpec extends AnyFreeSpec with Matchers {
     "should be able to create from RSA PublicKey params" in {
       val result =
         KeyId.fromRSAPublicKeyParams(Base64String(n, urlSafe = true), Base64String(e, urlSafe = true))
-      println(result)
-      result shouldBe Right(KeyId("zxHHCn6NUeqNxYOKWGV8kyUkgPOuwpIIF8_Fj0aaIIo"))
+      result shouldBe Right(KeyId("NzbLsXh8uDCcd-6MNwXF4W_7noWXFZAfHkxZsRGC9Xs"))
     }
     "should be able to create from RSA PublicKey" in {
       val keyId = for {
@@ -42,7 +41,7 @@ class KeyIdSpec extends AnyFreeSpec with Matchers {
           KeyId.fromRSAPublicKey(factory.generatePublic(keySpec).asInstanceOf[RSAPublicKey])
         }
       } yield result
-      keyId shouldBe Right(KeyId("zxHHCn6NUeqNxYOKWGV8kyUkgPOuwpIIF8_Fj0aaIIo"))
+      keyId shouldBe Right(KeyId("NzbLsXh8uDCcd-6MNwXF4W_7noWXFZAfHkxZsRGC9Xs"))
     }
   }
 }

@@ -1,17 +1,18 @@
 package com.chatwork.scala.jwk
 
+import cats.data.NonEmptyList
+
 import java.net.URI
 import java.security.interfaces.{ RSAPrivateCrtKey, RSAPrivateKey, RSAPublicKey }
 import java.security.spec.RSAPrivateKeySpec
 import java.security.{ KeyFactory, KeyPairGenerator }
-
 import com.github.j5ik2o.base64scala.{ Base64String, Base64StringFactory }
 import io.circe.parser._
-import io.circe.syntax._
+import org.scalatest.OptionValues
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.freespec.AnyFreeSpec
 
-class RSAJWKSpec extends AnyFreeSpec with Matchers with RSAJWKJsonImplicits {
+class RSAJWKSpec extends AnyFreeSpec with Matchers with OptionValues with RSAJWKJsonImplicits {
   val base64StringFactory = Base64StringFactory(urlSafe = true, isNoPadding = true)
   private val n = "0vx7agoebGcQSuuPiLJXZptN9nndrQmbXEps2aiAFbWhM78LhWx" +
     "4cbbfAAtVT86zwu1RK7aPFFxuhDR1L6tSoc_BJECPebWKRXjBZCiFV4n3oknjhMs" +
@@ -54,7 +55,7 @@ class RSAJWKSpec extends AnyFreeSpec with Matchers with RSAJWKJsonImplicits {
       val x5u    = new URI("http://example.com/jwk.json")
       val x5t    = Base64String("abc", urlSafe = true)
       val x5t256 = Base64String("abc256", urlSafe = true)
-      val x5c    = List(Base64String("def", urlSafe = true))
+      val x5c    = NonEmptyList.one(Base64String("def", urlSafe = true))
 
       val factory = KeyFactory.getInstance("RSA")
       val privateKey = for {
@@ -76,7 +77,7 @@ class RSAJWKSpec extends AnyFreeSpec with Matchers with RSAJWKJsonImplicits {
         x509Url = Some(x5u),
         x509CertificateSHA1Thumbprint = Some(x5t),
         x509CertificateSHA256Thumbprint = Some(x5t256),
-        x509CertificateChain = x5c,
+        x509CertificateChain = Some(x5c),
         d = Some(Base64String(d, urlSafe = true)),
         p = Some(Base64String(p, urlSafe = true)),
         q = Some(Base64String(q, urlSafe = true)),
@@ -93,8 +94,8 @@ class RSAJWKSpec extends AnyFreeSpec with Matchers with RSAJWKJsonImplicits {
       key.x509Url shouldBe Some(x5u)
       key.x509CertificateSHA1Thumbprint shouldBe Some(x5t)
       key.x509CertificateSHA256Thumbprint shouldBe Some(x5t256)
-      key.x509CertificateChain shouldBe x5c
-      key.x509CertificateChain.length shouldBe x5c.length
+      key.x509CertificateChain shouldBe Some(x5c)
+      key.x509CertificateChain.value.length shouldBe x5c.length
 
       key.modulus shouldBe Base64String(n, urlSafe = true)
       key.publicExponent shouldBe Base64String(e, urlSafe = true)
@@ -109,8 +110,6 @@ class RSAJWKSpec extends AnyFreeSpec with Matchers with RSAJWKJsonImplicits {
 
       key.firstCRTCoefficient shouldBe Some(Base64String(qi, urlSafe = true))
 
-      println(key.asJson.spaces2)
-
       key.isPrivate shouldBe true
 
       val publicKey = key.toPublicJWK
@@ -121,8 +120,8 @@ class RSAJWKSpec extends AnyFreeSpec with Matchers with RSAJWKJsonImplicits {
       publicKey.x509Url shouldBe Some(x5u)
       publicKey.x509CertificateSHA1Thumbprint shouldBe Some(x5t)
       publicKey.x509CertificateSHA256Thumbprint shouldBe Some(x5t256)
-      publicKey.x509CertificateChain shouldBe x5c
-      publicKey.x509CertificateChain.length shouldBe x5c.length
+      publicKey.x509CertificateChain shouldBe Some(x5c)
+      publicKey.x509CertificateChain.value.length shouldBe x5c.length
 
       publicKey.modulus shouldBe Base64String(n, urlSafe = true)
       publicKey.publicExponent shouldBe Base64String(e, urlSafe = true)
@@ -164,7 +163,7 @@ class RSAJWKSpec extends AnyFreeSpec with Matchers with RSAJWKJsonImplicits {
         x509Url = None,
         x509CertificateSHA1Thumbprint = None,
         x509CertificateSHA256Thumbprint = None,
-        x509CertificateChain = List.empty,
+        x509CertificateChain = None,
         d = Some(Base64String(d, urlSafe = true)),
         p = Some(Base64String(p, urlSafe = true)),
         q = Some(Base64String(q, urlSafe = true)),
@@ -229,7 +228,7 @@ class RSAJWKSpec extends AnyFreeSpec with Matchers with RSAJWKJsonImplicits {
         x509Url = None,
         x509CertificateSHA1Thumbprint = None,
         x509CertificateSHA256Thumbprint = None,
-        x509CertificateChain = List.empty
+        x509CertificateChain = None
       )
 
       key2.map(_.publicKeyUseType) shouldBe Right(Some(PublicKeyUseType.Signature))
@@ -263,7 +262,7 @@ class RSAJWKSpec extends AnyFreeSpec with Matchers with RSAJWKJsonImplicits {
         x509Url = None,
         x509CertificateSHA1Thumbprint = None,
         x509CertificateSHA256Thumbprint = None,
-        x509CertificateChain = List.empty
+        x509CertificateChain = None
       )
 
       key3.map(_.publicKeyUseType) shouldBe Right(Some(PublicKeyUseType.Signature))
@@ -309,7 +308,7 @@ class RSAJWKSpec extends AnyFreeSpec with Matchers with RSAJWKJsonImplicits {
         x509Url = None,
         x509CertificateSHA1Thumbprint = None,
         x509CertificateSHA256Thumbprint = None,
-        x509CertificateChain = List.empty,
+        x509CertificateChain = None,
         d = Some(Base64String(d, urlSafe = true)),
         p = Some(Base64String(p, urlSafe = true)),
         q = Some(Base64String(q, urlSafe = true)),
@@ -677,8 +676,8 @@ class RSAJWKSpec extends AnyFreeSpec with Matchers with RSAJWKJsonImplicits {
         "BniIqbw0Ls1jF44-csFCur-kEgU8awapJzKnqDKgw\"}"
       val jwk        = parse(jsonText).flatMap { json => json.as[RSAJWK] }
       val thumbprint = jwk.flatMap(_.computeThumbprint)
-      println(thumbprint)
       thumbprint shouldBe jwk.flatMap(_.computeThumbprint("SHA-256"))
+      thumbprint shouldBe Right(Base64String("NzbLsXh8uDCcd-6MNwXF4W_7noWXFZAfHkxZsRGC9Xs"))
     }
 
   }

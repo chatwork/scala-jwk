@@ -1,5 +1,7 @@
 package com.chatwork.scala.jwk
 
+import cats.data.NonEmptyList
+
 import java.net.URI
 import java.security._
 import java.security.interfaces.{ RSAPrivateCrtKey, RSAPrivateKey, RSAPublicKey }
@@ -37,7 +39,7 @@ object RSAJWK extends RSAJWKJsonImplicits {
       x509Url: Option[URI] = None,
       x509CertificateSHA1Thumbprint: Option[Base64String] = None,
       x509CertificateSHA256Thumbprint: Option[Base64String] = None,
-      x509CertificateChain: List[Base64String] = List.empty,
+      x509CertificateChain: Option[NonEmptyList[Base64String]] = None,
       d: Option[Base64String] = None,
       p: Option[Base64String] = None,
       q: Option[Base64String] = None,
@@ -87,7 +89,7 @@ object RSAJWK extends RSAJWKJsonImplicits {
       x509Url: Option[URI] = None,
       x509CertificateSHA1Thumbprint: Option[Base64String] = None,
       x509CertificateSHA256Thumbprint: Option[Base64String] = None,
-      x509CertificateChain: List[Base64String] = List.empty,
+      x509CertificateChain: Option[NonEmptyList[Base64String]] = None,
       expireAt: Option[ZonedDateTime] = None
   ): Either[JWKCreationError, RSAJWK] = {
     for {
@@ -125,7 +127,7 @@ object RSAJWK extends RSAJWKJsonImplicits {
       x509Url: Option[URI] = None,
       x509CertificateSHA1Thumbprint: Option[Base64String] = None,
       x509CertificateSHA256Thumbprint: Option[Base64String] = None,
-      x509CertificateChain: List[Base64String] = List.empty,
+      x509CertificateChain: Option[NonEmptyList[Base64String]] = None,
       expireAt: Option[ZonedDateTime] = None
   ): Either[JWKCreationError, RSAJWK] = {
     rsaPrivateKey match {
@@ -170,7 +172,7 @@ object RSAJWK extends RSAJWKJsonImplicits {
       x509Url: Option[URI] = None,
       x509CertificateSHA1Thumbprint: Option[Base64String] = None,
       x509CertificateSHA256Thumbprint: Option[Base64String] = None,
-      x509CertificateChain: List[Base64String] = List.empty,
+      x509CertificateChain: Option[NonEmptyList[Base64String]] = None,
       expireAt: Option[ZonedDateTime] = None
   ): Either[JWKCreationError, RSAJWK] = {
     for {
@@ -213,7 +215,7 @@ object RSAJWK extends RSAJWKJsonImplicits {
       x509Url: Option[URI] = None,
       x509CertificateSHA1Thumbprint: Option[Base64String] = None,
       x509CertificateSHA256Thumbprint: Option[Base64String] = None,
-      x509CertificateChain: List[Base64String] = List.empty,
+      x509CertificateChain: Option[NonEmptyList[Base64String]] = None,
       expireAt: Option[ZonedDateTime] = None
   ): Either[JWKCreationError, RSAJWK] = {
     for {
@@ -283,7 +285,7 @@ class RSAJWK private[jwk] (
     x509Url: Option[URI] = None,
     x509CertificateSHA1Thumbprint: Option[Base64String] = None,
     x509CertificateSHA256Thumbprint: Option[Base64String] = None,
-    x509CertificateChain: List[Base64String] = List.empty,
+    x509CertificateChain: Option[NonEmptyList[Base64String]] = None,
     d: Option[Base64String] = None,
     p: Option[Base64String] = None,
     q: Option[Base64String] = None,
@@ -643,7 +645,7 @@ trait RSAJWKJsonImplicits extends JsonImplicits {
       x5u    <- hcursor.getOrElse[Option[URI]]("k5u")(None)
       k5t    <- hcursor.getOrElse[Option[Base64String]]("k5t")(None)
       k5t256 <- hcursor.getOrElse[Option[Base64String]]("k5t#256")(None)
-      k5c    <- hcursor.getOrElse[List[Base64String]]("k5c")(List.empty)
+      k5c    <- hcursor.getOrElse[Option[NonEmptyList[Base64String]]]("k5c")(None)
       n      <- hcursor.get[Base64String]("n")
       e      <- hcursor.get[Base64String]("e")
       d      <- hcursor.getOrElse[Option[Base64String]]("d")(None)

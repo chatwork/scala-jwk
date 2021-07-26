@@ -1,11 +1,12 @@
 package com.chatwork.scala.jwk
 
+import cats.data.NonEmptyList
+
 import java.net.URI
 import java.security.interfaces.{ ECPrivateKey, ECPublicKey }
 import java.security.spec.{ ECPoint, ECPrivateKeySpec, ECPublicKeySpec, InvalidKeySpecException }
 import java.security.{ KeyFactory, NoSuchAlgorithmException, _ }
 import java.time.ZonedDateTime
-
 import com.chatwork.scala.jwk.JWKError._
 import com.chatwork.scala.jwk.utils.ECChecks
 import com.github.j5ik2o.base64scala.{ Base64EncodeError, Base64String, Base64StringFactory, BigIntUtils }
@@ -40,7 +41,7 @@ object ECJWK extends ECJWKJsonImplicits {
       x509Url: Option[URI] = None,
       x509CertificateSHA1Thumbprint: Option[Base64String] = None,
       x509CertificateSHA256Thumbprint: Option[Base64String] = None,
-      x509CertificateChain: List[Base64String] = List.empty,
+      x509CertificateChain: Option[NonEmptyList[Base64String]] = None,
       d: Option[Base64String] = None,
       privateKey: Option[PrivateKey] = None,
       expireAt: Option[ZonedDateTime] = None,
@@ -62,7 +63,8 @@ object ECJWK extends ECJWKJsonImplicits {
           x509CertificateChain,
           d,
           privateKey,
-          expireAt
+          expireAt,
+          keyStore
         )
       )
     } catch {
@@ -82,7 +84,7 @@ object ECJWK extends ECJWKJsonImplicits {
       x509Url: Option[URI] = None,
       x509CertificateSHA1Thumbprint: Option[Base64String] = None,
       x509CertificateSHA256Thumbprint: Option[Base64String] = None,
-      x509CertificateChain: List[Base64String] = List.empty,
+      x509CertificateChain: Option[NonEmptyList[Base64String]] = None,
       expireAt: Option[ZonedDateTime] = None
   ): Either[JWKCreationError, ECJWK] = {
     for {
@@ -155,7 +157,7 @@ class ECJWK private[jwk] (
     x509Url: Option[URI] = None,
     x509CertificateSHA1Thumbprint: Option[Base64String] = None,
     x509CertificateSHA256Thumbprint: Option[Base64String] = None,
-    x509CertificateChain: List[Base64String] = List.empty,
+    x509CertificateChain: Option[NonEmptyList[Base64String]] = None,
     val d: Option[Base64String] = None,
     val privateKey: Option[PrivateKey] = None,
     expireAt: Option[ZonedDateTime] = None,
@@ -357,7 +359,7 @@ trait ECJWKJsonImplicits extends JsonImplicits {
       x5u    <- hcursor.getOrElse[Option[URI]]("k5u")(None)
       k5t    <- hcursor.getOrElse[Option[Base64String]]("k5t")(None)
       k5t256 <- hcursor.getOrElse[Option[Base64String]]("k5t#256")(None)
-      k5c    <- hcursor.getOrElse[List[Base64String]]("k5c")(List.empty)
+      k5c    <- hcursor.getOrElse[Option[NonEmptyList[Base64String]]]("k5c")(None)
       crv    <- hcursor.get[Curve]("crv")
       x      <- hcursor.get[Base64String]("x")
       y      <- hcursor.get[Base64String]("y")

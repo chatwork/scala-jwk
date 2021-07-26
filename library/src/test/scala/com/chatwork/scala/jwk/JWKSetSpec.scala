@@ -133,8 +133,7 @@ class JWKSetSpec extends AnyFreeSpec with Matchers with JWKSetJsonImplicits {
           )
         )
       )
-      jwkSet.getOrElse(???) shouldBe JWKSet(rsaJwk("1"), rsaJwk("2"))
-      println(jwkSet)
+      jwkSet shouldBe Right(JWKSet(rsaJwk("1"), rsaJwk("2")))
     }
   }
 }

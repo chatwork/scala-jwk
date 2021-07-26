@@ -11,13 +11,21 @@ import com.github.j5ik2o.base64scala.{ Base64String, Base64StringFactory }
 
 object JWKThumbprint extends JWKJsonImplicits {
 
+  // See RFC 7638 3.2
+  val requiredKeysForEC: Set[String]  = Set("crv", "kty", "x", "y")
+  val requiredKeysForRSA: Set[String] = Set("e", "kty", "n")
+
   def computeFromJWK(jwk: JWK, hashAlg: String = "SHA-256"): Either[JWKThumbprintError, Base64String] =
-    computeFromJson(jwk.asJson, hashAlg)
+    jwk.keyType match {
+      case KeyType.EC       => computeFromJson(jwk.asJson.mapObject(_.filterKeys(requiredKeysForEC.contains)), hashAlg)
+      case KeyType.RSA      => computeFromJson(jwk.asJson.mapObject(_.filterKeys(requiredKeysForRSA.contains)), hashAlg)
+      case KeyType.Other(_) => computeFromJson(jwk.asJson, hashAlg)
+    }
 
   private def getDigest(json: Json, hashAlg: String): Either[JWKThumbprintError, Array[Byte]] = {
     try {
       val md = MessageDigest.getInstance(hashAlg)
-      md.update(json.noSpaces.getBytes(Charset.defaultCharset()))
+      md.update(json.noSpacesSortKeys.getBytes(Charset.defaultCharset()))
       Right(md.digest())
     } catch {
       case ex: NoSuchAlgorithmException =>
