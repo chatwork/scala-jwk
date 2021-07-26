@@ -1,12 +1,13 @@
 package com.chatwork.scala.jwk
 
+import cats.data.NonEmptyList
+
 import java.net.URI
 import java.security.KeyStore
 import java.time.ZonedDateTime
-
-import com.chatwork.scala.jwk.JWKError.{ JOSEError, JWKThumbprintError }
+import com.chatwork.scala.jwk.JWKError.{JOSEError, JWKThumbprintError}
 import com.github.j5ik2o.base64scala.Base64String
-import io.circe.{ Decoder, Encoder }
+import io.circe.{Decoder, Encoder}
 
 abstract class JWK(
     val keyType: KeyType,
@@ -17,14 +18,14 @@ abstract class JWK(
     val x509Url: Option[URI],
     val x509CertificateSHA256Thumbprint: Option[Base64String],
     val x509CertificateSHA1Thumbprint: Option[Base64String],
-    val x509CertificateChain: List[Base64String],
+    val x509CertificateChain: Option[NonEmptyList[Base64String]],
     val expireAt: Option[ZonedDateTime],
     val keyStore: Option[KeyStore]
 ) extends Ordered[JWK] {
 
   require(x509CertificateSHA256Thumbprint.fold(true)(_.urlSafe))
   require(x509CertificateSHA1Thumbprint.fold(true)(_.urlSafe))
-  require(if (x509CertificateChain.isEmpty) true else x509CertificateChain.forall(_.urlSafe))
+  require(x509CertificateChain.forall(_.forall(_.urlSafe)))
 
   require(
     publicKeyUseType.fold(true) { pku => KeyUseAndOpsConsistency.areConsistent(pku, keyOperations) },
