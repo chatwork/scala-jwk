@@ -5,9 +5,9 @@ import cats.data.NonEmptyList
 import java.net.URI
 import java.security.KeyStore
 import java.time.ZonedDateTime
-import com.chatwork.scala.jwk.JWKError.{JOSEError, JWKThumbprintError}
+import com.chatwork.scala.jwk.JWKError.{ JOSEError, JWKThumbprintError }
 import com.github.j5ik2o.base64scala.Base64String
-import io.circe.{Decoder, Encoder}
+import io.circe.{ Decoder, Encoder }
 
 abstract class JWK(
     val keyType: KeyType,
