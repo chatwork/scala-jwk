@@ -333,7 +333,7 @@ trait ECJWKJsonImplicits extends JsonImplicits {
     Json.obj(
       "kty"     -> v.keyType.asJson,
       "use"     -> v.publicKeyUseType.asJson,
-      "ops"     -> v.keyOperations.asJson,
+      "key_ops" -> v.keyOperations.asJson,
       "alg"     -> v.algorithmType.asJson,
       "kid"     -> v.keyId.asJson,
       "x5u"     -> v.x509Url.asJson,
@@ -353,7 +353,7 @@ trait ECJWKJsonImplicits extends JsonImplicits {
         if (v == KeyType.EC) Right(v) else Left(DecodingFailure("Invalid key type", hcursor.history))
       }
       use    <- hcursor.get[Option[PublicKeyUseType]]("use")
-      ops    <- hcursor.getOrElse[KeyOperations]("ops")(KeyOperations.empty)
+      ops    <- hcursor.getOrElse[KeyOperations]("key_ops")(KeyOperations.empty)
       alg    <- hcursor.getOrElse[Option[JWSAlgorithmType]]("alg")(None)
       kid    <- hcursor.getOrElse[Option[KeyId]]("kid")(None)
       x5u    <- hcursor.getOrElse[Option[URI]]("k5u")(None)
