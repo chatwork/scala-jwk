@@ -27,5 +27,5 @@ object scalacheck {
 }
 
 object j5ik2o {
-  val base64scala = "com.github.j5ik2o" %% "base64scala" % "1.0.29"
+  val base64scala = "com.github.j5ik2o" %% "base64scala" % "1.0.30"
 }
