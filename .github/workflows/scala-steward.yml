@@ -7,7 +7,7 @@ jobs:
   scala-steward:
     runs-on: ubuntu-latest
     steps:
-      - uses: scala-steward-org/scala-steward-action@v2
+      - uses: scala-steward-org/scala-steward-action@e47786bae0a964b4202df1d66b65c581a53257b0 # v2.83.0
         if: ${{ !github.event.repository.fork }}
         with:
           github-token: ${{ secrets.CW_SCALA_STEWARD_TOKEN }}
