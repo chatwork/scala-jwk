@@ -10,14 +10,14 @@ jobs:
       JAVA_OPTS: -Xms2048M -Xmx2048M -Xss6M -XX:ReservedCodeCacheSize=256M -Dfile.encoding=UTF-8
       JVM_OPTS:  -Xms2048M -Xmx2048M -Xss6M -XX:ReservedCodeCacheSize=256M -Dfile.encoding=UTF-8
     steps:
-    - uses: actions/checkout@v3.0.2
+    - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
       with:
         fetch-depth: 0
-    - uses: olafurpg/setup-scala@v13
+    - uses: olafurpg/setup-scala@56b893ae09c48f21c16a9793a107c2723ccc123a # v13
       with:
         java-version: "adopt@1.8"
-    - uses: coursier/cache-action@v6
-    - uses: olafurpg/setup-gpg@v3
+    - uses: coursier/cache-action@4e2615869d13561d626ed48655e1a39e5b192b3c # v6.4.9
+    - uses: olafurpg/setup-gpg@a62c5903e98d692e520bc2f46103b919a61dd386 # v3
     - run: sbt -v ci-release
       env:
         PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}

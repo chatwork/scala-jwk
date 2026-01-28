@@ -12,7 +12,7 @@ jobs:
   bump-version:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3.0.2
+    - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
       with:
         fetch-depth: 0
         persist-credentials: false
@@ -43,13 +43,13 @@ jobs:
         fi
     - name: Bump version and push tag
       id: tag_version
-      uses: mathieudutour/github-tag-action@v6.0
+      uses: mathieudutour/github-tag-action@d745f2e74aaf1ee82e747b181f7a0967978abee0 # v6.0
       with:
         github_token: ${{ secrets.CW_SCALA_STEWARD_TOKEN }}
         default_bump: patch
       if: steps.changes.outputs.count > 0
     - name: Create a GitHub release
-      uses: actions/create-release@v1
+      uses: actions/create-release@0cb9c9b65d5d1901c1f53e5e66eaf4afd303e70e # v1.1.4
       env:
         GITHUB_TOKEN: ${{ secrets.CW_SCALA_STEWARD_TOKEN }}
       with:
